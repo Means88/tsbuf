@@ -48,18 +48,18 @@ export interface Identifier extends BaseNode {
 
 export interface SyntaxDeclaration extends BaseNode {
   type: 'SyntaxDeclaration';
-  value: 'proto2' | 'proto3';
+  value: StringLiteral;
 }
 
 export interface PackageDeclaration extends BaseNode {
   type: 'PackageDeclaration';
-  value: string;
+  id: Identifier;
 }
 
 export interface OptionDeclaration extends BaseNode {
   type: 'OptionDeclaration';
-  name: string;
-  value: string;
+  id: Identifier;
+  value: StringLiteral;
 }
 
 // statements
@@ -69,6 +69,12 @@ export type Statement = Node;
 export interface BlockStatement extends BaseNode {
   type: 'BlockStatement';
   body: Statement[];
+}
+
+export interface RangeStatement extends BaseNode {
+  type: 'RangeStatement';
+  from: NumbericLiteral;
+  to: NumbericLiteral;
 }
 
 // enum
@@ -90,15 +96,31 @@ export interface EnumDeclaration extends BaseNode {
 export interface TypeAnnotation extends BaseNode {
   type: 'TypeAnnotation';
   optional: boolean;
+  repeated: boolean;
   value: KeywordType | Identifier;
 }
 
-export interface MessageMember extends BaseNode {
-  type: 'MessageMember';
+export interface MessageDeclarationMember extends BaseNode {
+  type: 'MessageDeclarationMember';
   typeAnnotation: TypeAnnotation;
   id: Identifier;
   value: NumbericLiteral;
 }
+
+export interface MessageReversedValue extends BaseNode {
+  type: 'MessageReversedValue';
+  value: NumbericLiteral | RangeStatement | StringLiteral;
+}
+
+export interface MessageReversedMember extends BaseNode {
+  type: 'MessageReversedMember';
+  reversedType: 'string' | 'number';
+  value: MessageReversedValue[];
+}
+
+export type MessageMember =
+  | MessageDeclarationMember
+  | MessageReversedMember;
 
 export interface MessageDeclaration extends BaseNode {
   type: 'MessageDeclaration';
