@@ -1,8 +1,12 @@
 export interface BaseNode {
   type: string;
-  start: number;
-  end: number;
-  fileName: string;
+  startLine?: number;
+  endLine?: number;
+  startColumn?: number;
+  endColumn?: number;
+  startOffset?: number;
+  endOffset?: number;
+  // fileName: string;
 }
 
 export type Node = BaseNode & { [key: string]: any };
@@ -65,6 +69,11 @@ export interface OptionDeclaration extends BaseNode {
 // statements
 
 export type Statement = Node;
+
+export interface ImportStatement extends BaseNode {
+  type: 'ImportStatement';
+  value: StringLiteral;
+}
 
 export interface BlockStatement extends BaseNode {
   type: 'BlockStatement';
