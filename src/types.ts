@@ -60,8 +60,8 @@ export interface PackageDeclaration extends BaseNode {
   id: Identifier;
 }
 
-export interface OptionDeclaration extends BaseNode {
-  type: 'OptionDeclaration';
+export interface OptionStatement extends BaseNode {
+  type: 'OptionStatement';
   id: Identifier;
   value: StringLiteral;
 }

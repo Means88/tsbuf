@@ -28,6 +28,7 @@ export const LineTerminatorToken = c({
 export const LineCommentToken = c({
   name: 'LineCommentToken',
   pattern: /\/\/.*/,
+  // group: "singleLineComments"
 });
 
 export const EqualToken = c({
@@ -37,6 +38,10 @@ export const EqualToken = c({
 
 export const StringLiteralToken = c({
   name: 'StringLiteralToken',
-  pattern: /"[^"]*"/,
+  pattern: /"(:?[^\\"]|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/,
 });
 
+export const IdentifierToken = c({
+  name: 'IdentifierToken',
+  pattern: /[a-zA-Z_][a-zA-Z_0-9]*/
+});

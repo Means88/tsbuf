@@ -1,14 +1,22 @@
 import { IParserConfig, IToken, Lexer, Parser } from "chevrotain";
 import {
-  EqualToken, ImportToken,
+  EqualToken, IdentifierToken, ImportToken,
   keywordTokens,
   LineCommentToken,
-  LineTerminatorToken, SemicolonToken,
+  LineTerminatorToken, OptionToken, PackageToken, SemicolonToken,
   StringLiteralToken,
   SyntaxToken,
   tokens
 } from "./token";
-import { Comment, ImportStatement, StringLiteral, SyntaxDeclaration } from "./types";
+import {
+  Comment,
+  Identifier,
+  ImportStatement,
+  OptionStatement,
+  PackageDeclaration,
+  StringLiteral,
+  SyntaxDeclaration
+} from "./types";
 import { endBy, startBy } from "./utils";
 
 const allTokens = [
@@ -48,6 +56,19 @@ export class ProtobufParser extends Parser {
       };
     });
 
+    // package some_idl;
+    p.RULE('packageDeclaration', (): PackageDeclaration => {
+      const packageToken = p.CONSUME(PackageToken);
+      const idNode = p.SUBRULE<Identifier>($.identifier);
+      const semiToken = p.CONSUME(SemicolonToken);
+      return {
+        type: 'PackageDeclaration',
+        id: idNode,
+        ...startBy(packageToken),
+        ...endBy(semiToken),
+      };
+    });
+
     // import "something_else.proto";
     p.RULE('importStatement', (): ImportStatement => {
       const importToken = p.CONSUME(ImportToken);
@@ -61,6 +82,22 @@ export class ProtobufParser extends Parser {
       };
     });
 
+    // option go_package = "means88.com/go/pkg";
+    p.RULE('optionStatement', (): OptionStatement => {
+      const optionToken = p.CONSUME(OptionToken);
+      const idNode = p.SUBRULE<Identifier>($.identifier);
+      p.CONSUME(EqualToken);
+      const valueNode = p.SUBRULE<StringLiteral>($.stringLiteral);
+      const semiToken = p.CONSUME(SemicolonToken);
+      return {
+        type: 'OptionStatement',
+        id: idNode,
+        value: valueNode,
+        ...startBy(optionToken),
+        ...endBy(semiToken),
+      };
+    });
+
     // "string"
     p.RULE('stringLiteral', (): StringLiteral => {
       const stringToken = p.CONSUME(StringLiteralToken);
@@ -70,6 +107,16 @@ export class ProtobufParser extends Parser {
         ...startBy(stringToken),
         ...endBy(stringToken),
       };
+    });
+
+    p.RULE('identifier', (): Identifier => {
+      const idToken = p.CONSUME(IdentifierToken);
+      return {
+        type: 'Identifier',
+        name: idToken.image,
+        ...startBy(idToken),
+        ...endBy(idToken),
+      }
     });
 
     this.performSelfAnalysis();

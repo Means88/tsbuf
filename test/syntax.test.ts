@@ -1,13 +1,9 @@
 import { expect } from 'chai';
-import { readFileSync } from 'fs';
-import * as path from 'path';
-import { ProtobufLexer, ProtobufParser } from "../../src/parser";
-
-const content = readFileSync(path.resolve(__dirname, './syntax.proto')).toString('utf-8');
+import { ProtobufLexer, ProtobufParser } from "../src/parser";
 
 describe('syntax', () => {
   it('should parse syntax statement', () => {
-    const result = ProtobufLexer.tokenize(content);
+    const result = ProtobufLexer.tokenize('syntax = "proto3";');
     const parser = new ProtobufParser();
     parser.input = result.tokens;
     const ast = (parser as any).syntaxDeclaration();
