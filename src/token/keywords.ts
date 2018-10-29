@@ -36,3 +36,8 @@ export const OptionToken = c({
   name: 'OptionToken',
   pattern: /\boption\b/,
 });
+
+export const MessageToken = c({
+  name: 'MessageToken',
+  pattern: /\bmessage\b/,
+});
