@@ -6,6 +6,7 @@
     "no-null-keyword": false,
     "newline-before-return": false,
     "no-any": false,
+    "no-unsafe-any": false,
     "no-magic-numbers": false,
     "no-parameter-properties": false,
     "no-require-imports": false,
@@ -13,18 +14,7 @@
     "strict-boolean-expressions": false,
     "no-inferrable-types": false,
     "comment-format": [true, "check-space"],
-    "completed-docs": [
-      true,
-      {
-        "classes": true,
-        "enums": true,
-        "enum-members": true,
-        "functions": true,
-        "interfaces": true,
-        "methods": { "tags": { "content": {}, "existence": ["inheritDoc"] } },
-        "properties": { "tags": { "content": {}, "existence": ["inheritDoc"] } }
-      }
-    ],
+    "completed-docs": false,
     "interface-name": [true, "never-prefix"],
     "member-ordering": [true, {"order": "statics-first"}],
     "no-console": [true, "log"],

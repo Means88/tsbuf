@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { ProtobufLexer, ProtobufParser } from "../src/parser";
+import { ProtobufLexer, ProtobufParser } from '../src/parser';
 
 describe('comment', () => {
   it('should parse line comment', () => {

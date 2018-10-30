@@ -1,4 +1,4 @@
-import { createToken, ITokenConfig, Lexer, TokenType } from "chevrotain";
+import { createToken, ITokenConfig, Lexer, TokenType } from 'chevrotain';
 
 export const keywordTokens: TokenType[] = [];
 

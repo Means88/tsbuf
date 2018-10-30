@@ -1,4 +1,4 @@
-import { createToken, ITokenConfig, Lexer, TokenType } from "chevrotain";
+import { createToken, ITokenConfig, Lexer, TokenType } from 'chevrotain';
 
 export const tokens: TokenType[] = [];
 
@@ -43,5 +43,5 @@ export const StringLiteralToken = c({
 
 export const IdentifierToken = c({
   name: 'IdentifierToken',
-  pattern: /[a-zA-Z_][a-zA-Z_0-9]*/
+  pattern: /[a-zA-Z_][a-zA-Z_0-9]*/,
 });

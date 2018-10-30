@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { ProtobufLexer, ProtobufParser } from "../src/parser";
+import { ProtobufLexer, ProtobufParser } from '../src/parser';
 
 describe('syntax', () => {
   it('should parse string literal', () => {
@@ -12,7 +12,7 @@ describe('syntax', () => {
   });
 
   it('should parse identifier', () => {
-    const result = ProtobufLexer.tokenize("package_name");
+    const result = ProtobufLexer.tokenize('package_name');
     const parser = new ProtobufParser();
     parser.input = result.tokens;
     const ast = (parser as any).identifier();

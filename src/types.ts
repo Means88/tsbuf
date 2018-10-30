@@ -127,9 +127,7 @@ export interface MessageReversedMember extends BaseNode {
   value: MessageReversedValue[];
 }
 
-export type MessageMember =
-  | MessageDeclarationMember
-  | MessageReversedMember;
+export type MessageMember = MessageDeclarationMember | MessageReversedMember;
 
 export interface MessageDeclaration extends BaseNode {
   type: 'MessageDeclaration';
