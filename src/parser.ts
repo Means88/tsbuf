@@ -6,12 +6,12 @@ import {
   ImportToken,
   IntegerToken,
   keywordTokens,
-  LeftBracketToken,
+  LeftBraceToken,
   LineCommentToken,
   LineTerminatorToken,
   OptionToken,
   PackageToken,
-  RightBracketToken,
+  RightBraceToken,
   SemicolonToken,
   StringLiteralToken,
   SyntaxToken,
@@ -151,17 +151,17 @@ export class ProtobufParser extends Parser {
         const enumToken = p.CONSUME(EnumToken);
         const identifier = p.SUBRULE<Identifier>($.identifier);
         const members: EnumMember[] = [];
-        p.CONSUME(LeftBracketToken);
+        p.CONSUME(LeftBraceToken);
         p.MANY(() => {
           members.push(p.SUBRULE<EnumMember>($.enumMember));
         });
-        const rightBracketToken = p.CONSUME(RightBracketToken);
+        const rightBraceToken = p.CONSUME(RightBraceToken);
         return {
           type: 'EnumDeclaration',
           id: identifier,
           members,
           ...startBy(enumToken),
-          ...endBy(rightBracketToken),
+          ...endBy(rightBraceToken),
         };
       },
     );

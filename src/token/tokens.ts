@@ -31,13 +31,13 @@ export const EqualToken = c({
   pattern: /=/,
 });
 
-export const LeftBracketToken = c({
-  name: 'LeftBracketToken',
+export const LeftBraceToken = c({
+  name: 'LeftBraceToken',
   pattern: /{/,
 });
 
-export const RightBracketToken = c({
-  name: 'RightBracketToken',
+export const RightBraceToken = c({
+  name: 'RightBraceToken',
   pattern: /}/,
 });
 
