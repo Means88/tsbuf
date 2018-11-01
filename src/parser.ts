@@ -1,13 +1,17 @@
 import { IParserConfig, IToken, Lexer, Parser } from 'chevrotain';
 import {
+  EnumToken,
   EqualToken,
   IdentifierToken,
   ImportToken,
+  IntegerToken,
   keywordTokens,
+  LeftBracketToken,
   LineCommentToken,
   LineTerminatorToken,
   OptionToken,
   PackageToken,
+  RightBracketToken,
   SemicolonToken,
   StringLiteralToken,
   SyntaxToken,
@@ -15,8 +19,11 @@ import {
 } from './token';
 import {
   Comment,
+  EnumDeclaration,
+  EnumMember,
   Identifier,
   ImportStatement,
+  IntegerLiteral,
   OptionStatement,
   PackageDeclaration,
   StringLiteral,
@@ -115,6 +122,50 @@ export class ProtobufParser extends Parser {
       },
     );
 
+    p.RULE(
+      'enumMember',
+      (): EnumMember => {
+        const identifier = p.SUBRULE<Identifier>($.identifier);
+        p.CONSUME(EqualToken);
+        const integerNode = p.SUBRULE<IntegerLiteral>($.integerLiteral);
+        const semiToken = p.CONSUME(SemicolonToken);
+        return {
+          type: 'EnumMember',
+          id: identifier,
+          value: integerNode,
+          ...startBy(identifier),
+          ...endBy(semiToken),
+        };
+      },
+    );
+
+    /**
+     * enum Fruit {
+     *   Apple = 1;
+     *   Banana = 2;
+     * }
+     */
+    p.RULE(
+      'enumDeclaration',
+      (): EnumDeclaration => {
+        const enumToken = p.CONSUME(EnumToken);
+        const identifier = p.SUBRULE<Identifier>($.identifier);
+        const members: EnumMember[] = [];
+        p.CONSUME(LeftBracketToken);
+        p.MANY(() => {
+          members.push(p.SUBRULE<EnumMember>($.enumMember));
+        });
+        const rightBracketToken = p.CONSUME(RightBracketToken);
+        return {
+          type: 'EnumDeclaration',
+          id: identifier,
+          members,
+          ...startBy(enumToken),
+          ...endBy(rightBracketToken),
+        };
+      },
+    );
+
     // "string"
     p.RULE(
       'stringLiteral',
@@ -125,6 +176,20 @@ export class ProtobufParser extends Parser {
           value: stringToken.image.slice(1, -1),
           ...startBy(stringToken),
           ...endBy(stringToken),
+        };
+      },
+    );
+
+    // 123
+    p.RULE(
+      'integerLiteral',
+      (): IntegerLiteral => {
+        const integerToken = p.CONSUME(IntegerToken);
+        return {
+          type: 'IntegerLiteral',
+          value: parseInt(integerToken.image, 10),
+          ...startBy(integerToken),
+          ...endBy(integerToken),
         };
       },
     );

@@ -41,3 +41,8 @@ export const MessageToken = c({
   name: 'MessageToken',
   pattern: /\bmessage\b/,
 });
+
+export const EnumToken = c({
+  name: 'EnumToken',
+  pattern: /\benum\b/,
+});

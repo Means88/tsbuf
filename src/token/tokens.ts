@@ -14,15 +14,31 @@ export const WhitespaceToken = c({
   group: Lexer.SKIPPED,
 });
 
+export const LineTerminatorToken = c({
+  name: 'LineTerminatorToken',
+  pattern: /\n|\r|\r\n/,
+  line_breaks: true,
+  group: Lexer.SKIPPED,
+});
+
 export const SemicolonToken = c({
   name: 'SemicolonToken',
   pattern: /;/,
 });
 
-export const LineTerminatorToken = c({
-  name: 'LineTerminatorToken',
-  pattern: /\n|\r|\r\n/,
-  line_breaks: true,
+export const EqualToken = c({
+  name: 'EqualToken',
+  pattern: /=/,
+});
+
+export const LeftBracketToken = c({
+  name: 'LeftBracketToken',
+  pattern: /{/,
+});
+
+export const RightBracketToken = c({
+  name: 'RightBracketToken',
+  pattern: /}/,
 });
 
 export const LineCommentToken = c({
@@ -31,14 +47,14 @@ export const LineCommentToken = c({
   // group: "singleLineComments"
 });
 
-export const EqualToken = c({
-  name: 'EqualToken',
-  pattern: /=/,
-});
-
 export const StringLiteralToken = c({
   name: 'StringLiteralToken',
   pattern: /"(:?[^\\"]|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/,
+});
+
+export const IntegerToken = c({
+  name: 'IntegerToken',
+  pattern: /\d+/,
 });
 
 export const IdentifierToken = c({

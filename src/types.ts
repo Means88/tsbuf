@@ -21,6 +21,11 @@ export interface NumbericLiteral extends BaseNode {
   value: number;
 }
 
+export interface IntegerLiteral extends BaseNode {
+  type: 'IntegerLiteral';
+  value: number;
+}
+
 export interface StringLiteral extends BaseNode {
   type: 'StringLiteral';
   value: string;
@@ -82,8 +87,8 @@ export interface BlockStatement extends BaseNode {
 
 export interface RangeStatement extends BaseNode {
   type: 'RangeStatement';
-  from: NumbericLiteral;
-  to: NumbericLiteral;
+  from: IntegerLiteral;
+  to: IntegerLiteral;
 }
 
 // enum
@@ -91,7 +96,7 @@ export interface RangeStatement extends BaseNode {
 export interface EnumMember extends BaseNode {
   type: 'EnumMember';
   id: Identifier;
-  value: NumbericLiteral;
+  value: IntegerLiteral;
 }
 
 export interface EnumDeclaration extends BaseNode {
