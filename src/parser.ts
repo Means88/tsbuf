@@ -24,6 +24,7 @@ import {
   Identifier,
   ImportStatement,
   IntegerLiteral,
+  MessageMember,
   OptionStatement,
   PackageDeclaration,
   StringLiteral,
@@ -165,6 +166,10 @@ export class ProtobufParser extends Parser {
         };
       },
     );
+
+    // p.RULE('messageMember', (): MessageMember => {
+    //
+    // });
 
     // "string"
     p.RULE(
