@@ -18,6 +18,10 @@ message Outer {
     int64 ival = 1;
   }
   map<int32, string> my_map = 2;
+  oneof test_oneof {
+    string name = 4;
+    SubMessage sub_message = 9;
+  }
 }
 
 service SearchService {

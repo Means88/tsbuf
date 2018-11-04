@@ -106,9 +106,9 @@ EnumType
 // Integer Literals
 
 IntLit
-  = DecimalLit { return { type: 'IntegerLiteral', value: parseInt(text(), 10) } }
-  / OctalLit  { return { type: 'IntegerLiteral', value: parseInt(text(), 8) } }
-  / HexLit { return { type: 'IntegerLiteral', value: parseInt(text(), 16) } }
+  = [-+]? _ DecimalLit { return { type: 'IntegerLiteral', value: parseInt(text(), 10) } }
+  / [-+]? _ OctalLit  { return { type: 'IntegerLiteral', value: parseInt(text(), 8) } }
+  / [-+]? _ HexLit { return { type: 'IntegerLiteral', value: parseInt(text(), 16) } }
 
 DecimalLit
   = [1-9] DecimalDigit*
@@ -122,7 +122,7 @@ HexLit
 // Floating-point literals
 
 FloatLit
-  = (Decimals "." Decimals? Exponent? / Decimals Exponent / "." Decimals Exponent?) / "inf" / "nan" {
+  = [-+]? _ (Decimals "." Decimals? Exponent? / Decimals Exponent / "." Decimals Exponent?) / "inf" / "nan" {
     return {
       type: 'FloatLiteral',
       value: parseFloat(text()),
@@ -175,7 +175,11 @@ EmptyStatement
 // Constant
 
 Constant
-  = FullIdent / ([-+] _ IntLit) / ([-+] _ FloatLit) / StrLit / BoolLit
+  = FullIdent
+  / IntLit
+  / FloatLit
+  / StrLit
+  / BoolLit
 
 // Syntax
 
@@ -250,21 +254,52 @@ FieldNumber = IntLit;
 // Normal field
 
 Field
-  = ("repeated" _)? Type _ FieldName _ "=" _ FieldNumber _ ("[" _ FieldOptions _ "]")? ";"
+  = repeated:("repeated" _)? typeName:Type _ name:FieldName _ "=" _ value:FieldNumber _ options:("[" _ FieldOptions _ "]")? ";" {
+    return {
+      type: 'Field',
+      repeated: Boolean(repeated),
+      typeName,
+      name,
+      value,
+      options: options && options.map(i => i[2]),
+    }
+  }
 
 FieldOptions
-  = FieldOption (_ "," _ FieldOption)*
+  = head:FieldOption tail:(_ "," _ FieldOption)* {
+    return [head, ...tail.map(i => i[3])];
+  }
 
 FieldOption
-  = OptionName _ "=" _ Constant
+  = name:OptionName _ "=" _ value:Constant {
+    return {
+      type: 'FieldOption',
+      name,
+      value,
+    }
+  }
 
 // Oneof and oneof field
 
 Oneof
-  = "oneof" _ OneofName _ "{" _ (OneofField / EmptyStatement) _ "}"
+  = "oneof" _ name:OneofName __ "{" __ body:(__ (OneofField / EmptyStatement) __)* __ "}" {
+    return {
+      type: 'Oneof',
+      name,
+      body: body && body.map(i => i[1]),
+    }
+  }
 
 OneofField
-  = Type _ FieldName _ "=" _ FieldNumber _ ("[" _ FieldOptions _ "]") _ ";"
+  = typeName:Type _ name:FieldName _ "=" _ value:FieldNumber _ options:("[" _ FieldOptions _ "]")? _ ";" {
+    return {
+      type: 'OneofField',
+      typeName,
+      name,
+      value,
+      options: options && options.map(o => o[2]),
+    }
+  }
 
 // Map field
 
@@ -273,7 +308,12 @@ MapField
 
 KeyType
   = "int32" / "int64" / "uint32" / "uint64" / "sint32" / "sint64" /
-    "fixed32" / "fixed64" / "sfixed32" / "sfixed64" / "bool" / "string"
+    "fixed32" / "fixed64" / "sfixed32" / "sfixed64" / "bool" / "string" {
+    return {
+      type: 'KeywordType',
+      typeName: text(),
+    }
+  }
 
 // Reversed
 
@@ -308,10 +348,21 @@ EnumValueOption
 // Message definition
 
 Message
-  = "message" _ MessageName __ MessageBody
+  = "message" _ name:MessageName __ body:MessageBody {
+    return {
+      type: 'Message',
+      name,
+      body,
+    }
+  }
 
 MessageBody
-  = "{" (__ (Field / Enum / Message / Option / Oneof / MapField / Reversed / EmptyStatement) __)* "}"
+  = "{" body:(__ (Field / Enum / Message / Option / Oneof / MapField / Reversed / EmptyStatement) __)* "}" {
+    return {
+      type: 'MessageBody',
+      body: body && body.map(i => i[1]),
+    }
+  }
 
 // Service definition
 
@@ -324,7 +375,13 @@ Rpc
 // Proto file
 
 Proto
-  = __ Syntax __ (__(Import / Package / Option / TopLevelDef / EmptyStatement)__)* __
+  = __ syntax:Syntax __ body:(__(Import / Package / Option / TopLevelDef / EmptyStatement)__)* __ {
+    return {
+      type: 'Proto',
+      syntax,
+      body: body && body.map(i => i[1]),
+    }
+  }
 
 TopLevelDef
   = Message / Enum / Service
