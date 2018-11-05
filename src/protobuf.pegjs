@@ -98,11 +98,24 @@ RpcName
   = Ident
 
 MessageType
-  = "."? (Ident ".")? MessageName
+  = root:"."? path:(Ident ".")* name:MessageName {
+    return {
+      type: 'MessageType',
+      name,
+      root: Boolean(root),
+      path,
+    }
+  }
 
 EnumType
-  = "."? (Ident ".") EnumName
-
+  = root:"."? path:(Ident ".")* name:EnumName {
+    return {
+      type: 'EnumType',
+      name,
+      root: Boolean(root),
+      path,
+    }
+  }
 // Integer Literals
 
 IntLit
@@ -185,7 +198,7 @@ Constant
 
 Syntax = "syntax" _ "=" _ Quote "proto3" Quote _ ";" {
   return {
-    type: 'SyntaxStatement',
+    type: 'Syntax',
     version: 'proto3',
   }
 }
@@ -206,7 +219,7 @@ Import
 Package
   = "package" _ identify:FullIdent _ ";" {
     return {
-      type: 'PackageStatement',
+      type: 'Package',
       identify,
     }
   }
@@ -229,7 +242,7 @@ OptionName
 
 // Field
 
-Type = ExtendedType / KeyType
+Type = KeyType / ExtendedType
 
 ExtendedType
   = identify:(EnumType / MessageType) {
@@ -254,20 +267,23 @@ FieldNumber = IntLit;
 // Normal field
 
 Field
-  = repeated:("repeated" _)? typeName:Type _ name:FieldName _ "=" _ value:FieldNumber _ options:("[" _ FieldOptions _ "]")? ";" {
+  = repeated:("repeated" _)? typeName:Type _ name:FieldName _ "=" _ value:FieldNumber _ options:FieldOptions? ";" {
     return {
       type: 'Field',
       repeated: Boolean(repeated),
       typeName,
       name,
       value,
-      options: options && options.map(i => i[2]),
+      options: options,
     }
   }
 
 FieldOptions
-  = head:FieldOption tail:(_ "," _ FieldOption)* {
-    return [head, ...tail.map(i => i[3])];
+  = "[" _ head:FieldOption tail:(_ "," _ FieldOption)* _ "]" {
+    return {
+      type: 'FieldOptions',
+      options: [head, ...(tail ? tail.map(i => i[3]) : [])],
+    }
   }
 
 FieldOption
@@ -304,7 +320,16 @@ OneofField
 // Map field
 
 MapField
-  = "map" _ "<" _ KeyType _ "," _ Type _ ">" _ MapName _ "=" _ FieldNumber _ ("[" _ FieldOptions _ "]")? _ ";"
+  = "map" _ "<" _ keyTypeName:KeyType _ "," _ valueTypeName:Type _ ">" _ name:MapName _ "=" _ value:FieldNumber _ options:("[" _ FieldOptions _ "]")? _ ";" {
+    return {
+      type: 'MapField',
+      keyTypeName,
+      valueTypeName,
+      name,
+      value,
+      option: options && options[2],
+    }
+  }
 
 KeyType
   = "int32" / "int64" / "uint32" / "uint64" / "sint32" / "sint64" /
@@ -318,32 +343,85 @@ KeyType
 // Reversed
 
 Reversed
-  = "reversed" _ (Ranges / FieldNames) _ ";"
+  = "reversed" _ value:(Ranges / FieldNames) _ ";" {
+    return {
+      type: 'Reversed',
+      value,
+    }
+  }
 
 Ranges
-  = Range _ ("," _ Range)*
+  = head:Range _ tails:("," _ Range)* {
+    return {
+      type: 'Ranges',
+      values: [head, tails ? tails.map(i => i[2]) : []]
+    }
+  }
 
 Range
-  = IntLit _ ("to" _ (IntLit / "max"))?
+  = from:IntLit _ to:("to" _ (IntLit / "max"))? {
+    return {
+      type: 'Range',
+      from,
+      to: to && to[2],
+    }
+  }
 
 FieldNames
-  = FieldName _ ("," _ FieldName)*
+  = head:FieldName _ tail:("," _ FieldName)* {
+    return {
+      type: 'FieldNames',
+      value: [head, ...(tail ? tail.map(i => i[2]) : [])]
+    }
+  }
 
 // Top Level definitions
 
 // Enum definition
 
 Enum
-  = "enum" _ EnumName __ EnumBody
+  = "enum" _ name:EnumName __ body:EnumBody {
+    return {
+      type: 'Enum',
+      name,
+      body,
+    }
+  }
 
 EnumBody
-  = "{" __ (__ (Option / EnumField / EmptyStatement) __)* __ "}"
+  = "{" __ body:(__ (Option / EnumField / EmptyStatement) __)* __ "}" {
+    return {
+      type: 'EnumBody',
+      body: body ? body.map(i => i[1]) : [],
+    }
+  }
 
 EnumField
-  = Ident _ "=" _ IntLit _ ("[" _ EnumValueOption _ ("," _ EnumValueOption)* _ "]")? _ ";"
+  = name:Ident _ "=" _ value:IntLit _ options:EnumValueOptions? _ ";" {
+    return {
+      type: 'EnumField',
+      name,
+      value,
+      options,
+    }
+  }
+
+EnumValueOptions
+  = "[" _ head:EnumValueOption _ tail:("," _ EnumValueOption)* _ "]" {
+    return {
+      type: 'EnumValueOptions',
+      options: [head, ...(tail ? tail.map(i => i[2]) : [])],
+    }
+  }
 
 EnumValueOption
-  = OptionName _ "=" _ Constant
+  = name:OptionName _ "=" _ value:Constant {
+    return {
+      type: 'EnumValueOption',
+      name,
+      value,
+    }
+  }
 
 // Message definition
 
@@ -367,10 +445,42 @@ MessageBody
 // Service definition
 
 Service
-  = "service" _ ServiceName __ "{" __ (Option / Rpc / EmptyStatement)* __ "}"
+  = "service" _ name:ServiceName __ body:ServiceBody {
+    return {
+      type: 'Service',
+      name,
+      body,
+    }
+  }
+
+ServiceBody
+  = "{" __ body:(Option / Rpc / EmptyStatement)* __ "}" {
+    return {
+      type: 'ServiceBody',
+      body,
+    }
+  }
 
 Rpc
-  = "rpc" _ RpcName _ "(" _ "stream"? _ MessageType _ ")" _ "returns" _ "(" _ "stream"? _ MessageType _ ")" __ (("{" __ (Option / EmptyStatement) __ "}") / ";")
+  = "rpc" _ name:RpcName _ "(" _ argStream:"stream"? _ argTypeName:MessageType _ ")" _ "returns" _ "(" _ returnStream:"stream"? _ returnTypeName:MessageType _ ")" __ body:(RpcBody / ';') {
+    return {
+      type: 'Rpc',
+      name,
+      argStream: argStream !== null,
+      argTypeName,
+      returnStream: returnStream !== null,
+      returnTypeName,
+      body: body === ';' ? null : body,
+    }
+  }
+
+RpcBody
+  = "{" __ body:(Option / EmptyStatement)* __ "}" {
+    return {
+      type: 'RpcBody',
+      body,
+    }
+  }
 
 // Proto file
 
