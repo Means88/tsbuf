@@ -100,20 +100,20 @@ RpcName
 MessageType
   = root:"."? path:(Ident ".")* name:MessageName {
     return {
-      type: 'MessageType',
+      type: 'ExtendedType',
       name,
       root: Boolean(root),
-      path,
+      path: path ? path.map(i => i[0]) : [],
     }
   }
 
 EnumType
   = root:"."? path:(Ident ".")* name:EnumName {
     return {
-      type: 'EnumType',
+      type: 'ExtendedType',
       name,
       root: Boolean(root),
-      path,
+      path: path ? path.map(i => i[0]) : [],
     }
   }
 // Integer Literals
@@ -236,8 +236,12 @@ Option
   }
 
 OptionName
-  = (Ident / "(" FullIdent ")") ("." Ident)* {
-    return text()
+  = namespace:(Ident / "(" FullIdent ")") fields:("." Ident)* {
+    return {
+      type: 'OptionName',
+      namespace: Array.isArray(namespace) ? namespace[1] : namespace,
+      fields: fields && fields.map(i => i[1]),
+    }
   }
 
 // Field
@@ -274,16 +278,13 @@ Field
       typeName,
       name,
       value,
-      options: options,
+      options,
     }
   }
 
 FieldOptions
   = "[" _ head:FieldOption tail:(_ "," _ FieldOption)* _ "]" {
-    return {
-      type: 'FieldOptions',
-      options: [head, ...(tail ? tail.map(i => i[3]) : [])],
-    }
+    return [head, ...(tail ? tail.map(i => i[3]) : [])];
   }
 
 FieldOption
@@ -302,7 +303,7 @@ Oneof
     return {
       type: 'Oneof',
       name,
-      body: body && body.map(i => i[1]),
+      body: body ? body.map(i => i[1]) : [],
     }
   }
 
@@ -390,10 +391,7 @@ Enum
 
 EnumBody
   = "{" __ body:(__ (Option / EnumField / EmptyStatement) __)* __ "}" {
-    return {
-      type: 'EnumBody',
-      body: body ? body.map(i => i[1]) : [],
-    }
+    return body ? body.map(i => i[1]) : [];
   }
 
 EnumField
@@ -408,10 +406,7 @@ EnumField
 
 EnumValueOptions
   = "[" _ head:EnumValueOption _ tail:("," _ EnumValueOption)* _ "]" {
-    return {
-      type: 'EnumValueOptions',
-      options: [head, ...(tail ? tail.map(i => i[2]) : [])],
-    }
+    return [head, ...(tail ? tail.map(i => i[2]) : [])];
   }
 
 EnumValueOption
@@ -436,10 +431,7 @@ Message
 
 MessageBody
   = "{" body:(__ (Field / Enum / Message / Option / Oneof / MapField / Reversed / EmptyStatement) __)* "}" {
-    return {
-      type: 'MessageBody',
-      body: body && body.map(i => i[1]),
-    }
+    return body ? body.map(i => i[1]) : [];
   }
 
 // Service definition
@@ -455,10 +447,7 @@ Service
 
 ServiceBody
   = "{" __ body:(Option / Rpc / EmptyStatement)* __ "}" {
-    return {
-      type: 'ServiceBody',
-      body,
-    }
+    return body;
   }
 
 Rpc

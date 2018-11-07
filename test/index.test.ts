@@ -12,6 +12,7 @@ describe('index', () => {
   });
 
   it('should parse without exception', () => {
-    Parser.parse(proto);
+    const ast = Parser.parse(proto);
+    expect(ast).not.to.equal(null);
   });
 });
