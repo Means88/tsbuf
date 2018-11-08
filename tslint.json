@@ -23,6 +23,7 @@
     "variable-name": [true, "check-format", "ban-keywords", "allow-pascal-case"],
     "no-implicit-dependencies": [true, "dev"],
     "no-this-assignment": false,
-    "object-literal-sort-keys": false
+    "object-literal-sort-keys": false,
+    "file-name-casing": false
   }
 }

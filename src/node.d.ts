@@ -41,7 +41,7 @@ interface OptionName extends BaseNode {
 interface Enum extends BaseNode {
   type: 'Enum';
   name: Identify;
-  body: [];
+  body: EnumField[];
 }
 
 interface EnumField extends BaseNode {
@@ -60,7 +60,7 @@ interface EnumValueOption extends BaseNode {
 interface Message extends BaseNode {
   type: 'Message';
   name: Identify;
-  body: [];
+  body: Field[];
 }
 
 interface Field extends BaseNode {

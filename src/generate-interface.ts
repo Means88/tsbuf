@@ -1,15 +1,5 @@
+import { baseVisitor, WalkAction } from './base-visitor';
 import { Path } from './path';
-
-type WalkAction = (node: BaseNode) => void;
-
-const baseVisitor = {
-  Proto(path: Path, walk: WalkAction): void {
-    const proto = path.node as Proto;
-    for (const node of proto.body) {
-      walk(node);
-    }
-  },
-};
 
 class Generator {
   private static readonly noop = (): void => {
