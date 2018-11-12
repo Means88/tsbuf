@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Parser } from '../src/index';
+import { Parser } from '../src/parser';
 
 const fileName = path.resolve(__dirname, './proto/message.proto');
 const proto = fs.readFileSync(fileName).toString();

@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+enum Fruit {
+  Apple = 0;
+  Banana = 1;
+}

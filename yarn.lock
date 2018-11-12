@@ -60,6 +60,10 @@
   version "0.10.1"
   resolved "https://registry.yarnpkg.com/@types/pegjs/-/pegjs-0.10.1.tgz#9a2f3961dc62430fdb21061eb0ddbd890f9e3b94"
 
+"@types/prettier@^1.13.2":
+  version "1.13.2"
+  resolved "http://registry.npm.taobao.org/@types/prettier/download/@types/prettier-1.13.2.tgz#ffe96278e712a8d4e467e367a338b05e22872646"
+
 "@types/sinon@^5.0.5":
   version "5.0.5"
   resolved "https://registry.yarnpkg.com/@types/sinon/-/sinon-5.0.5.tgz#de600fa07eb1ec9d5f55669d5bac46a75fc88115"
@@ -2987,9 +2991,9 @@ prettier-check@^2.0.0:
   dependencies:
     execa "^0.6.0"
 
-prettier@^1.14.3:
-  version "1.14.3"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.14.3.tgz#90238dd4c0684b7edce5f83b0fb7328e48bd0895"
+prettier@^1.15.2:
+  version "1.15.2"
+  resolved "http://registry.npm.taobao.org/prettier/download/prettier-1.15.2.tgz#d31abe22afa4351efa14c7f8b94b58bb7452205e"
 
 pretty-format@^23.6.0:
   version "23.6.0"

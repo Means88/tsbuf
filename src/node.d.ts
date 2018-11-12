@@ -23,7 +23,7 @@ interface ImportStatement extends BaseNode {
 
 interface Package extends BaseNode {
   type: 'Package';
-  identify: Identify;
+  identify: Identifier;
 }
 
 interface Option extends BaseNode {
@@ -34,19 +34,19 @@ interface Option extends BaseNode {
 
 interface OptionName extends BaseNode {
   type: 'OptionName';
-  namespace: Identify | FullIdentify;
-  fields: Identify[];
+  namespace: Identifier | FullIdentifier;
+  fields: Identifier[];
 }
 
 interface Enum extends BaseNode {
   type: 'Enum';
-  name: Identify;
+  name: Identifier;
   body: EnumField[];
 }
 
 interface EnumField extends BaseNode {
   type: 'EnumField';
-  name: Identify;
+  name: Identifier;
   value: IntegerLiteral;
   options: Nullable<EnumValueOption[]>;
 }
@@ -59,7 +59,7 @@ interface EnumValueOption extends BaseNode {
 
 interface Message extends BaseNode {
   type: 'Message';
-  name: Identify;
+  name: Identifier;
   body: Field[];
 }
 
@@ -67,7 +67,7 @@ interface Field extends BaseNode {
   type: 'Field';
   repeated: boolean;
   typeName: Type;
-  name: Identify;
+  name: Identifier;
   value: IntegerLiteral;
   options: Nullable<FieldOption[]>;
 }
@@ -76,20 +76,20 @@ interface MapField extends BaseNode {
   type: 'MapField';
   keyTypeName: Type;
   valueTypeName: Type;
-  name: Identify;
+  name: Identifier;
   value: IntegerLiteral;
   options: Nullable<FieldOption[]>;
 }
 
 interface Oneof extends BaseNode {
   type: 'OneofField';
-  name: Identify;
+  name: Identifier;
   body: Array<OneofField | EmptyStatement>;
 }
 
 interface OneofField extends BaseNode {
   typeName: Type;
-  name: Identify;
+  name: Identifier;
   value: IntegerLiteral;
   options: Nullable<FieldOption[]>;
 }
@@ -109,20 +109,20 @@ interface KeywordType extends BaseNode {
 
 interface ExtendedType extends BaseNode {
   type: 'ExtendedType';
-  name: Identify;
+  name: Identifier;
   root: boolean;
-  path: Identify[];
+  path: Identifier[];
 }
 
-type Constant = FullIdentify | StringLiteral | IntegerLiteral;
+type Constant = FullIdentifier | StringLiteral | IntegerLiteral;
 
-interface Identify extends BaseNode {
-  type: 'Identify';
+interface Identifier extends BaseNode {
+  type: 'Identifier';
   name: string;
 }
 
-interface FullIdentify extends BaseNode {
-  type: 'FullIdentify';
+interface FullIdentifier extends BaseNode {
+  type: 'FullIdentifier';
   name: string;
 }
 

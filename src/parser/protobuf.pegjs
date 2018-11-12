@@ -63,7 +63,7 @@ HexDigit
 Ident
   = Letter (Letter / DecimalDigit / "_")* {
     return {
-      type: 'Identify',
+      type: 'Identifier',
       name: text(),
     }
   }
@@ -71,7 +71,7 @@ Ident
 FullIdent
   = Ident ("." Ident)* {
     return {
-      type: 'FullIdentify',
+      type: 'FullIdentifier',
       name: text(),
     }
   }
@@ -246,7 +246,7 @@ OptionName
 
 // Field
 
-Type = KeyType / ExtendedType
+Type = KeywordType / ExtendedType
 
 ExtendedType
   = identify:(EnumType / MessageType) {
