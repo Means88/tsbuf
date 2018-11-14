@@ -1,6 +1,31 @@
 #!/usr/bin/env node
-
+const fs = require('fs');
+const path = require('path');
+const chalk = require('chalk');
+const mkdirp = require('mkdirp');
 const { executeMe } = require('execute-me');
+
+const { exportText } = require('./dist');
+const { Parser } = require('./dist/parser');
+const { Generator } = require('./dist/typescript/generate-interface');
+
+const logger = {
+  log(a = '') {
+    console.log(a);
+  },
+  success(a = '') {
+    console.log(`${chalk.green('success')} ${a}`);
+  },
+  error(a = '') {
+    console.log(`${chalk.red('error')} ${a}`);
+  },
+  warning(a = '') {
+    console.log(`${chalk.yellow('warning')} ${a}`);
+  },
+  pri(a = '') {
+    console.log(`${chalk.blue(a)}`);
+  }
+};
 
 function tsbuf(output = '.', mode = "global") {
   /**
@@ -11,14 +36,34 @@ function tsbuf(output = '.', mode = "global") {
    * @param {string} output - output path
    * @param {string} mode - "global": Global Definition, "module": Module Definition
    */
-  const path = arguments[arguments.length - 1];
+  const inputPath = arguments[arguments.length - 1][0];
   console.log(JSON.stringify({
-    path,
+    inputPath,
     output,
     mode,
   }, null, 2));
 
+  if (!inputPath) {
+    logger.error('Input file is not specified.');
+    process.exit(1);
+  }
 
+  const inputFile = path.resolve(inputPath);
+  const fileName = path.basename(inputFile, '.proto');
+  let outputPath = path.resolve(output);
+  if (!outputPath.endsWith('.ts')) {
+    outputPath = path.join(outputPath, `${fileName}${mode === 'global' ? '.d' : ''}.ts`);
+  }
+
+  const proto = fs.readFileSync(inputFile).toString();
+  const ast = Parser.parse(proto);
+  const generator = new Generator(ast);
+  const interfaces = generator.getInterfaces();
+  const text = exportText(interfaces, mode);
+
+  mkdirp.sync(path.dirname(outputPath));
+  fs.writeFileSync(outputPath, text);
+  logger.success(`Generate ${outputPath}`);
 }
 
 executeMe(tsbuf);

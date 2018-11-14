@@ -1,8 +1,8 @@
 import * as prettier from 'prettier';
 
 export enum GenerateMode {
-  Global = 0,
-  MODULE = 1,
+  Global = 'global',
+  MODULE = 'module',
 }
 
 const generateEnum = (mode: GenerateMode = GenerateMode.Global) => (ast: Enum): string =>
