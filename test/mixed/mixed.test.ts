@@ -1,23 +1,16 @@
-import { expect } from 'chai';
-import * as fs from 'fs';
 import * as path from 'path';
-import { Parser } from '../../src/parser';
-import { Generator } from '../../src/typescript/generate-interface';
-import { exportText } from '../../src/typescript/helper';
+import { compare } from '../utils';
 
-const fileName = path.resolve(__dirname, './message.proto');
-const proto = fs.readFileSync(fileName).toString();
+describe('mixed', () => {
+  it('should generate mixed', () => {
+    const fileName = path.resolve(__dirname, './message.proto');
+    const tsFileName = path.resolve(__dirname, './message.ts');
+    compare(fileName, tsFileName);
+  });
 
-const tsFileName = path.resolve(__dirname, './message.ts');
-const message = fs.readFileSync(tsFileName).toString();
-
-describe('index', () => {
-  it('should generate', () => {
-    const ast = Parser.parse(proto);
-    const generator = new Generator(ast);
-    const interfaces = generator.getInterfaces();
-    expect(interfaces).not.to.equal(null);
-    const text = exportText(interfaces);
-    expect(text).to.equal(message);
+  it('should generate extended type', () => {
+    const fileName = path.resolve(__dirname, './extended.proto');
+    const tsFileName = path.resolve(__dirname, './extended.ts');
+    compare(fileName, tsFileName);
   });
 });

@@ -101,7 +101,7 @@ MessageType
   = root:"."? path:(Ident ".")* name:MessageName {
     return {
       type: 'ExtendedType',
-      name,
+      identifier: name,
       root: Boolean(root),
       path: path ? path.map(i => i[0]) : [],
     }
@@ -111,7 +111,7 @@ EnumType
   = root:"."? path:(Ident ".")* name:EnumName {
     return {
       type: 'ExtendedType',
-      name,
+      identifier: name,
       root: Boolean(root),
       path: path ? path.map(i => i[0]) : [],
     }
@@ -217,10 +217,10 @@ Import
 // Package
 
 Package
-  = "package" _ identify:FullIdent _ ";" {
+  = "package" _ identifier:FullIdent _ ";" {
     return {
       type: 'Package',
-      identify,
+      identifier,
     }
   }
 
@@ -249,11 +249,8 @@ OptionName
 Type = KeywordType / ExtendedType
 
 ExtendedType
-  = identify:(EnumType / MessageType) {
-    return {
-      type: 'ExtendedType',
-      identify,
-    }
+  = identifier:(EnumType / MessageType) {
+    return identifier;
   }
 
 KeywordType

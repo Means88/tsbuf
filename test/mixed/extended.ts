@@ -6,4 +6,5 @@ export enum Fruit {
 export interface Package {
   id: string;
   price: number;
+  fruit: Fruit;
 }

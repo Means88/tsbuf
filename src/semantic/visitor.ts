@@ -1,36 +1,21 @@
-import { Binding } from '../visitor/binding';
 import { Path } from '../visitor/path';
 import { Scope } from '../visitor/scope';
+import { ScopeStack } from '../visitor/scope-stack';
 import { Action, Actions, Visitor, WalkAction } from '../visitor/type';
-
-const scopeStack: Scope[] = [];
-
-function getTopScope(): Scope {
-  return scopeStack.slice(-1)[0];
-}
-
-function getBinding(id: string): Nullable<Binding> {
-  let scope: Nullable<Scope> = getTopScope();
-  while (scope !== null) {
-    if (id in scope.bindings) {
-      return scope.bindings[id];
-    }
-    scope = scope.parent;
-  }
-  return null;
-}
 
 export const semanticVisitor: Visitor = {
   Proto: {
     enter(path: Path, walk: WalkAction): void {
       const proto = path.node as Proto;
-      scopeStack.push(new Scope(path, null));
+      const scopeStack = new ScopeStack();
+      path.context.scopeStack = scopeStack;
+      scopeStack.pushScope(new Scope(path, null));
       for (const node of proto.body) {
         walk(node);
       }
     },
-    exit(): void {
-      scopeStack.pop();
+    exit(path: Path): void {
+      path.context.scopeStack.popScope();
     },
   },
   Enum(path: Path, walk: WalkAction): void {
@@ -54,6 +39,6 @@ export const semanticVisitor: Visitor = {
     walk(enumValueOption.value);
   },
   Identifier(path: Path, walk: WalkAction): void {
-    getTopScope().createBinding(path);
+    path.context.scopeStack.createBinding(path);
   },
 };

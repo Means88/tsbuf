@@ -1,4 +1,4 @@
-declare enum Fruit {
+export enum Fruit {
   Apple = 0,
   Banana = 1,
 }

@@ -1,4 +1,4 @@
-interface Package {
+export interface Package {
   id: string;
   price: number;
 }

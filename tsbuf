@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+
+const { executeMe } = require('execute-me');
+
+function tsbuf(output = '.', mode = "global") {
+  /**
+   * protobuf-parser
+   * Generate TypeScript interface with Protobuf.
+   *
+   * @version 0.1.0
+   * @param {string} output - output path
+   * @param {string} mode - "global": Global Definition, "module": Module Definition
+   */
+  const path = arguments[arguments.length - 1];
+  console.log(JSON.stringify({
+    path,
+    output,
+    mode,
+  }, null, 2));
+
+
+}
+
+executeMe(tsbuf);

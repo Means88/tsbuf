@@ -109,7 +109,7 @@ interface KeywordType extends BaseNode {
 
 interface ExtendedType extends BaseNode {
   type: 'ExtendedType';
-  name: Identifier;
+  identifier: Identifier;
   root: boolean;
   path: Identifier[];
 }
