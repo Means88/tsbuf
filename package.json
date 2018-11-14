@@ -1,7 +1,7 @@
 {
-  "name": "protobuf-parser",
-  "version": "0.1.0",
-  "description": "proto buffer parser",
+  "name": "tsbuf",
+  "version": "0.0.1",
+  "description": "Generate TypeScript enum and interface with proto buffer.",
   "main": "dist/index.js",
   "bin": "tsbuf",
   "scripts": {
@@ -33,18 +33,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Means88/protobuf-parser.git"
+    "url": "git+https://github.com/Means88/tsbuf.git"
   },
   "keywords": [
     "protobuf",
-    "parser"
+    "parser",
+    "typescript"
   ],
   "author": "Means88",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Means88/protobuf-parser/issues"
+    "url": "https://github.com/Means88/tsbuf/issues"
   },
-  "homepage": "https://github.com/Means88/protobuf-parser#readme",
+  "homepage": "https://github.com/Means88/tsbuf#readme",
   "devDependencies": {
     "@types/chai": "^4.1.6",
     "@types/jest": "^23.3.7",
@@ -69,6 +70,7 @@
   "dependencies": {
     "chalk": "^2.4.1",
     "execute-me": "^0.2.0",
+    "file": "^0.2.2",
     "gulp": "^3.9.1",
     "gulp-typescript": "^5.0.0-alpha.3",
     "mkdirp": "^0.5.1",
@@ -93,5 +95,12 @@
         "tsConfig": "./tsconfig.json"
       }
     }
-  }
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "dist",
+    "tsbuf"
+  ]
 }

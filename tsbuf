@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const fs = require('fs');
+const file = require('file');
 const path = require('path');
 const chalk = require('chalk');
 const mkdirp = require('mkdirp');
@@ -43,22 +44,42 @@ function tsbuf(output = '.', mode = "global") {
     process.exit(1);
   }
 
-  const inputFile = path.resolve(inputPath);
-  const fileName = path.basename(inputFile, '.proto');
-  let outputPath = path.resolve(output);
-  if (!outputPath.endsWith('.ts')) {
-    outputPath = path.join(outputPath, `${fileName}${mode === 'global' ? '.d' : ''}.ts`);
+  const absoluteInputPath = path.resolve(inputPath);
+  const ext = `${mode === 'global' ? '.d' : ''}.ts`;
+
+  if (fs.lstatSync(absoluteInputPath).isFile()) {
+    let outputPath = path.resolve(output);
+    if (!outputPath.endsWith('.ts')) {
+      outputPath = path.join(outputPath, `${fileName}${ext}`);
+    }
+    generateTs(absoluteInputPath, outputPath, mode);
+    return;
   }
 
-  const proto = fs.readFileSync(inputFile).toString();
+  file.walk(absoluteInputPath, (err, dirPath, dirs, files) => {
+    for (const file of files) {
+      if (!file.endsWith('.proto')) {
+        continue;
+      }
+      const relativePath = path.relative(absoluteInputPath, file);
+      const absolutePath = path.resolve(output, relativePath);
+      const outputDir = path.dirname(absolutePath);
+      const fileName = path.basename(absolutePath, '.proto');
+      generateTs(file, path.resolve(outputDir, `${fileName}${ext}`), mode);
+    }
+  });
+}
+
+function generateTs(inputFileName, outputFileName, mode) {
+  const proto = fs.readFileSync(inputFileName).toString();
   const ast = Parser.parse(proto);
   const generator = new Generator(ast);
   const interfaces = generator.getInterfaces();
   const text = exportText(interfaces, mode);
 
-  mkdirp.sync(path.dirname(outputPath));
-  fs.writeFileSync(outputPath, text);
-  logger.success(`Generate ${outputPath}`);
+  mkdirp.sync(path.dirname(outputFileName));
+  fs.writeFileSync(outputFileName, text);
+  logger.success(`Generate ${outputFileName}`);
 }
 
 executeMe(tsbuf);

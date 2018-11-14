@@ -1,13 +1,22 @@
-# Protobuf Parser
+# tsbuf  [![npm@version](https://img.shields.io/npm/v/tsbuf.svg)](https://www.npmjs.com/package/tsbuf)
 
-A Parser of Proto Buffer.
+Generate TypeScript enum and interface with proto buffer.
 
----
+## Usage
+```bash
+npm install -g protobuf-parser
+tsbuf ~/path/to/protobuf/root -o output/
+```
+
 
 ## Roadmap
 
 - [x] Basic Support
-- [ ] ExtendedType Field
+- [x] ExtendedType Field
+- [x] Cli
+- [ ] Oneof Field
+- [ ] Map Field
 - [ ] Nested Type
-- [ ] Import
+- [x] Generate Global Declaration
+- [ ] Import (Generate Module)
 - [ ] Other Options
