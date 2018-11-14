@@ -37,11 +37,6 @@ function tsbuf(output = '.', mode = "global") {
    * @param {string} mode - "global": Global Definition, "module": Module Definition
    */
   const inputPath = arguments[arguments.length - 1][0];
-  console.log(JSON.stringify({
-    inputPath,
-    output,
-    mode,
-  }, null, 2));
 
   if (!inputPath) {
     logger.error('Input file is not specified.');
