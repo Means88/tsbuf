@@ -3,13 +3,24 @@ import { Scope } from '../visitor/scope';
 import { ScopeStack } from '../visitor/scope-stack';
 import { Action, Actions, Visitor, WalkAction } from '../visitor/type';
 
+function pushScope(path: Path): void {
+  const topScope = path.context.scopeStack.getTopScope();
+  path.context.scopeStack.pushScope(new Scope(path, topScope));
+}
+
+function popScope(path: Path): Nullable<Scope> {
+  return path.context.scopeStack.popScope();
+}
+
 export const semanticVisitor: Visitor = {
   Proto: {
-    enter(path: Path, walk: WalkAction): void {
-      const proto = path.node as Proto;
+    enter(path: Path): void {
       const scopeStack = new ScopeStack();
       path.context.scopeStack = scopeStack;
-      scopeStack.pushScope(new Scope(path, null));
+    },
+    in(path: Path, walk: WalkAction): void {
+      const proto = path.node as Proto;
+      path.context.scopeStack.pushScope(new Scope(path, null));
       for (const node of proto.body) {
         walk(node);
       }
@@ -37,6 +48,15 @@ export const semanticVisitor: Visitor = {
     const enumValueOption = path.node as EnumValueOption;
     walk(enumValueOption.name);
     walk(enumValueOption.value);
+  },
+  Message(path: Path, walk: WalkAction): void {
+    const message = path.node as Message;
+    walk(message.name);
+    pushScope(path);
+    for (const node of message.body) {
+      walk(node);
+    }
+    popScope(path);
   },
   Identifier(path: Path, walk: WalkAction): void {
     path.context.scopeStack.createBinding(path);

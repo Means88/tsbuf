@@ -8,5 +8,6 @@ interface Visitor {
 
 interface Actions {
   enter: Action;
+  in: Action;
   exit: Action;
 }

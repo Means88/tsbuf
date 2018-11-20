@@ -1,7 +1,7 @@
 import { semanticVisitor } from '../semantic/visitor';
 import { Path } from '../visitor/path';
 import { Action, Actions, Visitor } from '../visitor/type';
-import { tsVisitor } from './visitor';
+import { TsVisitor } from './visitor';
 
 export class Generator {
   private static readonly noop = (): void => {
@@ -11,25 +11,27 @@ export class Generator {
   private static getActions(node: BaseNode, visitor: Visitor): Actions {
     if (typeof visitor[node.type] === 'function') {
       return {
-        enter: visitor[node.type] as Action,
+        enter: Generator.noop,
+        in: visitor[node.type] as Action,
         exit: Generator.noop,
       };
     }
     return {
       enter: Generator.noop,
+      in: Generator.noop,
       exit: Generator.noop,
       ...visitor[node.type],
     };
   }
 
   private readonly ast: BaseNode;
-  private readonly visitors: any[];
+  private readonly visitors: Visitor[];
   private readonly context: any = {};
   private currentNode: Nullable<BaseNode> = null;
 
-  public constructor(ast: BaseNode, plugins: any[] = []) {
+  public constructor(ast: BaseNode, plugins: Visitor[] = []) {
     this.ast = ast;
-    this.visitors = [tsVisitor, ...plugins, semanticVisitor];
+    this.visitors = [new TsVisitor().getVisitor(), ...plugins, semanticVisitor];
   }
 
   public getInterfaces(): any {
@@ -44,6 +46,10 @@ export class Generator {
     for (const visitor of this.visitors) {
       const actions = Generator.getActions(node, visitor);
       actions.enter(currentPath, this.walk);
+    }
+    for (const visitor of this.visitors) {
+      const actions = Generator.getActions(node, visitor);
+      actions.in(currentPath, this.walk);
     }
     for (const visitor of this.visitors) {
       const actions = Generator.getActions(node, visitor);

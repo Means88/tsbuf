@@ -1,5 +1,8 @@
 {
   "extends": ["tslint:all", "tslint-config-prettier"],
+  "linterOptions": {
+    "exclude": "test/**/*.ts"
+  },
   "rules": {
     "no-unused-variable": false,
     "no-submodule-imports": false,

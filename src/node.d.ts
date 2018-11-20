@@ -60,7 +60,7 @@ interface EnumValueOption extends BaseNode {
 interface Message extends BaseNode {
   type: 'Message';
   name: Identifier;
-  body: Field[];
+  body: Array<Field | Message>;
 }
 
 interface Field extends BaseNode {

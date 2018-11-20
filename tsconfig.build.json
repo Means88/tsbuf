@@ -3,8 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "sourceMap": true
   },
   "include": ["src/**/*.ts", "types/**/*.ts"],
-  "exclude": ["**/*.test.ts"]
+  "exclude": ["test/**/*.ts"]
 }

@@ -1,8 +1,20 @@
+import { generate } from 'pegjs';
 import * as prettier from 'prettier';
+
+export interface InterfaceTree {
+  node: {
+    name: string;
+    fields: Array<{
+      typeName: Type;
+      name: string;
+    }>;
+  };
+  children: InterfaceTree[];
+}
 
 export enum GenerateMode {
   Global = 'global',
-  MODULE = 'module',
+  Module = 'module',
 }
 
 const generateEnum = (mode: GenerateMode = GenerateMode.Global) => (ast: Enum): string =>
@@ -12,16 +24,30 @@ const generateEnum = (mode: GenerateMode = GenerateMode.Global) => (ast: Enum): 
     }
   `;
 
-const generateInterface = (mode: GenerateMode = GenerateMode.Global) => (ast: Message): string =>
+// const generateInterface = (mode: GenerateMode = GenerateMode.Global) => (ast: Message): string =>
+//   `
+//     ${mode === GenerateMode.Global ? '' : 'export '}interface ${ast.name.name} {
+//       ${ast.body.map((f: Field): string => `${f.name.name}: ${typeMapping(f.typeName as KeywordType)}`)}
+//     }
+//   `;
+
+const generateInterface = (mode: GenerateMode) => (i: InterfaceTree): string =>
   `
-    ${mode === GenerateMode.Global ? '' : 'export '}interface ${ast.name.name} {
-      ${ast.body.map((f: Field): string => `${f.name.name}: ${typeMapping(f.typeName as KeywordType)}`)}
-    }
-  `;
+${mode === GenerateMode.Global ? '' : 'export '}interface ${i.node.name} {
+  ${i.node.fields.map((f: { name: string; typeName: Type }) => `${f.name}: ${typeMapping(f.typeName)};`).join('')}
+}
+
+${
+    i.children.length <= 0
+      ? ''
+      : `${mode === GenerateMode.Global ? 'declare' : 'export'} namespace ${i.node.name} {
+  ${i.children.map(j => generateInterface(GenerateMode.Module)(j)).join('\n')}
+}`
+  }`;
 
 export function exportText(result: any, mode: GenerateMode = GenerateMode.Global): string {
   const enums: string = result.enums.map(generateEnum(mode)).join('\n');
-  const interfaces: string = result.interfaces.map(generateInterface(mode)).join('\n');
+  const interfaces: string = result.interfaces.map((i: InterfaceTree) => generateInterface(mode)(i)).join('\n');
   const text = enums + interfaces;
   return prettier.format(text, { parser: 'typescript' });
 }

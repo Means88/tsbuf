@@ -5,7 +5,7 @@ import { exportText, GenerateMode } from '../src';
 import { Parser } from '../src/parser';
 import { Generator } from '../src/typescript/generate-interface';
 
-export function compare(protoFile: string, tsFile: string, mode: GenerateMode = GenerateMode.MODULE): void {
+export function compare(protoFile: string, tsFile: string, mode: GenerateMode = GenerateMode.Module): void {
   const proto = fs.readFileSync(protoFile).toString();
   const message = fs.readFileSync(tsFile).toString();
 

@@ -191,3 +191,4 @@ typings/
 coverage/
 .rpt2_cache/
 /build
+/tmp

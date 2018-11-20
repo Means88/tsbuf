@@ -42,4 +42,8 @@ export class Scope {
     });
     return true;
   }
+
+  public getBinding(id: string): Nullable<Binding> {
+    return this.bindings[id] || null;
+  }
 }
