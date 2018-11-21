@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+message Foo {
+  string foo = 1;
+  message Bar {
+    string bar = 1;
+  }
+  Bar bar = 2;
+}
+
+message Bar {
+  Foo.Bar bar = 2;
+}

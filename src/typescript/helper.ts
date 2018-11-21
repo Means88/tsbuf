@@ -1,4 +1,3 @@
-import { generate } from 'pegjs';
 import * as prettier from 'prettier';
 
 export interface InterfaceTree {
@@ -23,13 +22,6 @@ const generateEnum = (mode: GenerateMode = GenerateMode.Global) => (ast: Enum): 
       ${ast.body.map((f: EnumField): string => `${f.name.name} = ${f.value.value},`).join('\n')}
     }
   `;
-
-// const generateInterface = (mode: GenerateMode = GenerateMode.Global) => (ast: Message): string =>
-//   `
-//     ${mode === GenerateMode.Global ? '' : 'export '}interface ${ast.name.name} {
-//       ${ast.body.map((f: Field): string => `${f.name.name}: ${typeMapping(f.typeName as KeywordType)}`)}
-//     }
-//   `;
 
 const generateInterface = (mode: GenerateMode) => (i: InterfaceTree): string =>
   `
@@ -84,5 +76,8 @@ function keywordTypeMapping(typeName: KeywordType): string {
 }
 
 function extendedTypeMapping(typeName: ExtendedType): string {
-  return typeName.identifier.name;
+  if (!typeName.path || typeName.path.length === 0) {
+    return typeName.identifier.name;
+  }
+  return [...typeName.path.map(id => id.name), typeName.identifier.name].join('.');
 }
