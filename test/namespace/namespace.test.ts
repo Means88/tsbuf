@@ -20,4 +20,10 @@ describe('namespace', () => {
     const tsFileName = path.resolve(__dirname, './nested-reference.ts');
     compare(fileName, tsFileName);
   });
+
+  it('should generate deep nested', () => {
+    const fileName = path.resolve(__dirname, './deep-nested.proto');
+    const tsFileName = path.resolve(__dirname, './deep-nested.ts');
+    compare(fileName, tsFileName);
+  });
 });

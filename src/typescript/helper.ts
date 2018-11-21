@@ -23,10 +23,20 @@ const generateEnum = (mode: GenerateMode = GenerateMode.Global) => (ast: Enum): 
     }
   `;
 
-const generateInterface = (mode: GenerateMode) => (i: InterfaceTree): string =>
-  `
+const generateInterface = (mode: GenerateMode) => (i: InterfaceTree): string => {
+  const scopeNames = i.children.map(c => c.node.name);
+
+  const getType = (typeName: Type): string => {
+    const name = typeMapping(typeName);
+    if (scopeNames.indexOf(name) === -1) {
+      return name;
+    }
+    return `${i.node.name}.${name}`;
+  };
+
+  return `
 ${mode === GenerateMode.Global ? '' : 'export '}interface ${i.node.name} {
-  ${i.node.fields.map((f: { name: string; typeName: Type }) => `${f.name}: ${typeMapping(f.typeName)};`).join('')}
+  ${i.node.fields.map((f: { name: string; typeName: Type }) => `${f.name}: ${getType(f.typeName)};`).join('')}
 }
 
 ${
@@ -36,6 +46,7 @@ ${
   ${i.children.map(j => generateInterface(GenerateMode.Module)(j)).join('\n')}
 }`
   }`;
+};
 
 export function exportText(result: any, mode: GenerateMode = GenerateMode.Global): string {
   const enums: string = result.enums.map(generateEnum(mode)).join('\n');
