@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+enum Fruit {
+  Apple = 0;
+  Banana = 1;
+}
+
+message Basket {
+  repeated Fruit fruit_list = 1;
+  string name = 2;
+  int32 price = 3;
+}

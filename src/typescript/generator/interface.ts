@@ -1,4 +1,4 @@
-import * as prettier from 'prettier';
+import { GenerateMode } from './const';
 
 export interface InterfaceTreeNormalField {
   type: 'normal';
@@ -26,18 +26,6 @@ export interface InterfaceTree {
   children: InterfaceTree[];
 }
 
-export enum GenerateMode {
-  Global = 'global',
-  Module = 'module',
-}
-
-const generateEnum = (mode: GenerateMode = GenerateMode.Global) => (ast: Enum): string =>
-  `
-    ${mode === GenerateMode.Global ? 'declare' : 'export'} enum ${ast.name.name} {
-      ${ast.body.map((f: EnumField): string => `${f.name.name} = ${f.value.value},`).join('\n')}
-    }
-  `;
-
 function getType(field: InterfaceTreeField, it: InterfaceTree): string {
   const scopeNames = it.children.map(c => c.node.name);
   const name = typeMapping(field.typeName);
@@ -58,7 +46,7 @@ function generateMapField(f: InterfaceTreeMapField, it: InterfaceTree): string {
   };`;
 }
 
-const generateInterface = (mode: GenerateMode) => (i: InterfaceTree): string =>
+export const generateInterface = (mode: GenerateMode) => (i: InterfaceTree): string =>
   `
 ${mode === GenerateMode.Global ? '' : 'export '}interface ${i.node.name} {
   ${i.node.fields
@@ -81,13 +69,6 @@ ${
   ${i.children.map(j => generateInterface(GenerateMode.Module)(j)).join('\n')}
 }`
   }`;
-
-export function exportText(result: any, mode: GenerateMode = GenerateMode.Global): string {
-  const enums: string = result.enums.map(generateEnum(mode)).join('\n');
-  const interfaces: string = result.interfaces.map((i: InterfaceTree) => generateInterface(mode)(i)).join('\n');
-  const text = enums + interfaces;
-  return prettier.format(text, { parser: 'typescript' });
-}
 
 function typeMapping(typeName: Type): string {
   if (typeName.type === 'KeywordType') {

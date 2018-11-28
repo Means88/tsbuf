@@ -1,7 +1,7 @@
 import { Path } from '../visitor/path';
 import { Scope } from '../visitor/scope';
 import { ScopeStack } from '../visitor/scope-stack';
-import { Action, Actions, Visitor, WalkAction } from '../visitor/type';
+import { Visitor, WalkAction } from '../visitor/type';
 
 function pushScope(path: Path): void {
   const topScope = path.context.scopeStack.getTopScope();

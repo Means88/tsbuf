@@ -1,7 +1,10 @@
-import { semanticVisitor } from '../semantic/visitor';
-import { Path } from '../visitor/path';
-import { Action, Actions, Visitor } from '../visitor/type';
-import { TsVisitor } from './visitor';
+import { semanticVisitor } from '../../semantic/visitor';
+import { Path } from '../../visitor/path';
+import { Action, Actions, Visitor } from '../../visitor/type';
+
+import { EnumVisitor } from '../visitors/enum';
+import { ImportVisitor } from '../visitors/import';
+import { InterfaceVisitor } from '../visitors/interface';
 
 export class Generator {
   private static readonly noop = (): void => {
@@ -31,10 +34,16 @@ export class Generator {
 
   public constructor(ast: BaseNode, plugins: Visitor[] = []) {
     this.ast = ast;
-    this.visitors = [new TsVisitor().getVisitor(), ...plugins, semanticVisitor];
+    this.visitors = [
+      new EnumVisitor().getVisitor(),
+      new InterfaceVisitor().getVisitor(),
+      new ImportVisitor().getVisitor(),
+      ...plugins,
+      semanticVisitor,
+    ];
   }
 
-  public getInterfaces(): any {
+  public getResult(): any {
     this.walk(this.ast);
     return this.context;
   }

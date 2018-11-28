@@ -2,31 +2,8 @@
 const fs = require('fs');
 const file = require('file');
 const path = require('path');
-const chalk = require('chalk');
-const mkdirp = require('mkdirp');
 const { executeMe } = require('execute-me');
-
-const { exportText } = require('./dist');
-const { Parser } = require('./dist/parser');
-const { Generator } = require('./dist/typescript/generate-interface');
-
-const logger = {
-  log(a = '') {
-    console.log(a);
-  },
-  success(a = '') {
-    console.log(`${chalk.green('success')} ${a}`);
-  },
-  error(a = '') {
-    console.log(`${chalk.red('error')} ${a}`);
-  },
-  warning(a = '') {
-    console.log(`${chalk.yellow('warning')} ${a}`);
-  },
-  pri(a = '') {
-    console.log(`${chalk.blue(a)}`);
-  }
-};
+const { exportSingleFile, TypeScriptExporter, logger } = require('./dist/cli/exporter');
 
 function tsbuf(output = '.', mode = "global") {
   /**
@@ -50,36 +27,27 @@ function tsbuf(output = '.', mode = "global") {
   if (fs.lstatSync(absoluteInputPath).isFile()) {
     let outputPath = path.resolve(output);
     if (!outputPath.endsWith('.ts')) {
+      const fileName = path.basename(absoluteInputPath, '.proto');
       outputPath = path.join(outputPath, `${fileName}${ext}`);
     }
-    generateTs(absoluteInputPath, outputPath, mode);
+    exportSingleFile(absoluteInputPath, outputPath, mode);
+    logger.success(`Generate ${outputPath}`);
     return;
   }
 
+  const exporter = new TypeScriptExporter();
   file.walk(absoluteInputPath, (err, dirPath, dirs, files) => {
     for (const file of files) {
       if (!file.endsWith('.proto')) {
         continue;
       }
-      const relativePath = path.relative(absoluteInputPath, file);
-      const absolutePath = path.resolve(output, relativePath);
-      const outputDir = path.dirname(absolutePath);
-      const fileName = path.basename(absolutePath, '.proto');
-      generateTs(file, path.resolve(outputDir, `${fileName}${ext}`), mode);
+      const absolutePath = path.resolve(output);
+      exporter.handleSource(mode, file, absoluteInputPath, absolutePath, (fileName) => {
+        logger.error(`Generate from ${path.relative(absoluteInputPath, fileName)}`);
+        return true;
+      });
     }
   });
-}
-
-function generateTs(inputFileName, outputFileName, mode) {
-  const proto = fs.readFileSync(inputFileName).toString();
-  const ast = Parser.parse(proto);
-  const generator = new Generator(ast);
-  const interfaces = generator.getInterfaces();
-  const text = exportText(interfaces, mode);
-
-  mkdirp.sync(path.dirname(outputFileName));
-  fs.writeFileSync(outputFileName, text);
-  logger.success(`Generate ${outputFileName}`);
 }
 
 executeMe(tsbuf);

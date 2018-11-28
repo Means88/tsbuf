@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+import "module/fruit.proto";
+
+message Foo {
+  Basket basket = 1;
+}

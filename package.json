@@ -49,6 +49,7 @@
   "devDependencies": {
     "@types/chai": "^4.1.6",
     "@types/jest": "^23.3.7",
+    "@types/mkdirp": "^0.5.2",
     "@types/node": "^10.12.0",
     "@types/pegjs": "^0.10.1",
     "@types/prettier": "^1.13.2",

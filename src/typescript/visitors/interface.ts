@@ -1,23 +1,15 @@
-import { Path } from '../visitor/path';
-import { Visitor } from '../visitor/type';
-import { InterfaceTree } from './helper';
+import { Path } from '../../visitor/path';
+import { Visitor } from '../../visitor/type';
+import { InterfaceTree } from '../generator/interface';
 
-export class TsVisitor {
+export class InterfaceVisitor {
   private readonly rootInterfaces: InterfaceTree[] = [];
   private readonly interfaceScopeStack: InterfaceTree[] = [];
 
   private readonly visitor: Visitor = {
     Proto: {
-      enter(path: Path): void {
-        path.context.enums = [];
-      },
       exit: (path: Path): void => {
         path.context.interfaces = this.rootInterfaces;
-      },
-    },
-    Enum: {
-      exit(path: Path): void {
-        path.context.enums.push(path.node);
       },
     },
     Message: {

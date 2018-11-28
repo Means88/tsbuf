@@ -5,18 +5,39 @@ Generate TypeScript enum and interface with proto buffer.
 ## Usage
 ```bash
 npm install -g protobuf-parser
-tsbuf ~/path/to/protobuf/root -o output/
+tsbuf example/proto -o example/typescript/global
+# or
+tsbuf example/proto -o example/typescript/module -m module
+ 
 ```
+See `example/`
 
+```console
+$ tsbuf -h
+Usage: tsbuf [options] <inputPath> 
+
+protobuf-parser
+Generate TypeScript interface with Protobuf.
+
+Options:
+  -V, --version          output the version number
+  -o, --output <output>  output path (default: ".")
+  -m, --mode <mode>      "global": Global Definition, "module": Module Definition (default: "global")
+  -h, --help             output usage information
+
+```
 
 ## Roadmap
 
 - [x] Basic Support
 - [x] ExtendedType Field
 - [x] Cli
-- [ ] Oneof Field
-- [ ] Map Field
+- [x] Oneof Field
+- [x] Map Field
 - [x] Nested Type
 - [x] Generate Global Declaration
-- [ ] Import (Generate Module)
+- [x] Import (Generate Module)
 - [ ] Other Options
+
+## License
+MIT
