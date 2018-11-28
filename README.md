@@ -1,4 +1,4 @@
-# tsbuf  [![npm@version](https://img.shields.io/npm/v/tsbuf.svg)](https://www.npmjs.com/package/tsbuf) [![Build Status](https://travis-ci.org/Means88/tsbuf.svg?branch=master)](https://travis-ci.org/Means88/tsbuf)
+# tsbuf  [![npm@version](https://img.shields.io/npm/v/tsbuf.svg)](https://www.npmjs.com/package/tsbuf) [![Build Status](https://travis-ci.org/Means88/tsbuf.svg?branch=master)](https://travis-ci.org/Means88/tsbuf) [![Coverage Status](https://coveralls.io/repos/github/Means88/tsbuf/badge.svg?branch=master)](https://coveralls.io/github/Means88/tsbuf?branch=master)
 
 Generate TypeScript enum and interface with proto buffer.
 
