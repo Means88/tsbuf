@@ -44,9 +44,24 @@ export class TsVisitor {
           throw new Error('Field should be included in Message.');
         }
         iscope.node.fields.push({
+          type: 'normal',
           typeName: field.typeName,
           name: field.name.name,
           repeated: field.repeated,
+        });
+      },
+    },
+    MapField: {
+      exit: (path: Path): void => {
+        const field = path.node as MapField;
+        const iscope = this.getInterfaceScope();
+        if (iscope === null) {
+          throw new Error('Field should be included in Message.');
+        }
+        iscope.node.fields.push({
+          type: 'map',
+          typeName: field.valueTypeName,
+          name: field.name.name,
         });
       },
     },

@@ -1,10 +1,20 @@
 import * as prettier from 'prettier';
 
-export interface InterfaceTreeField {
+export interface InterfaceTreeNormalField {
+  type: 'normal';
   typeName: Type;
   name: string;
   repeated: boolean;
 }
+
+export interface InterfaceTreeMapField {
+  type: 'map';
+  typeName: Type;
+  name: string;
+  repeated?: false;
+}
+
+type InterfaceTreeField = InterfaceTreeNormalField | InterfaceTreeMapField;
 
 export interface InterfaceTree {
   node: {
@@ -26,21 +36,40 @@ const generateEnum = (mode: GenerateMode = GenerateMode.Global) => (ast: Enum): 
     }
   `;
 
-const generateInterface = (mode: GenerateMode) => (i: InterfaceTree): string => {
-  const scopeNames = i.children.map(c => c.node.name);
+function getType(field: InterfaceTreeField, it: InterfaceTree): string {
+  const scopeNames = it.children.map(c => c.node.name);
+  const name = typeMapping(field.typeName);
+  let fullName = scopeNames.indexOf(name) === -1 ? name : `${it.node.name}.${name}`;
+  if (field.repeated) {
+    fullName += '[]';
+  }
+  return fullName;
+}
 
-  const getType = (field: InterfaceTreeField): string => {
-    const name = typeMapping(field.typeName);
-    let fullName = scopeNames.indexOf(name) === -1 ? name : `${i.node.name}.${name}`;
-    if (field.repeated) {
-      fullName += '[]';
-    }
-    return fullName;
-  };
+function generateNormalField(f: InterfaceTreeNormalField, it: InterfaceTree): string {
+  return `${f.name}: ${getType(f, it)};`;
+}
 
-  return `
+function generateMapField(f: InterfaceTreeMapField, it: InterfaceTree): string {
+  return `${f.name}: {
+    [key: string]: ${getType(f, it)},
+  };`;
+}
+
+const generateInterface = (mode: GenerateMode) => (i: InterfaceTree): string =>
+  `
 ${mode === GenerateMode.Global ? '' : 'export '}interface ${i.node.name} {
-  ${i.node.fields.map((f: InterfaceTreeField) => `${f.name}: ${getType(f)};`).join('')}
+  ${i.node.fields
+    .map((f: InterfaceTreeField) => {
+      if (f.type === 'normal') {
+        return generateNormalField(f, i);
+      }
+      if (f.type === 'map') {
+        return generateMapField(f, i);
+      }
+      return '';
+    })
+    .join('')}
 }
 
 ${
@@ -50,7 +79,6 @@ ${
   ${i.children.map(j => generateInterface(GenerateMode.Module)(j)).join('\n')}
 }`
   }`;
-};
 
 export function exportText(result: any, mode: GenerateMode = GenerateMode.Global): string {
   const enums: string = result.enums.map(generateEnum(mode)).join('\n');
