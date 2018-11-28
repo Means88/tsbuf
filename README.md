@@ -4,7 +4,7 @@ Generate TypeScript enum and interface with proto buffer.
 
 ## Usage
 ```bash
-npm install -g protobuf-parser
+npm install -g tsbuf
 tsbuf example/proto -o example/typescript/global
 # or
 tsbuf example/proto -o example/typescript/module -m module
@@ -24,6 +24,49 @@ Options:
   -o, --output <output>  output path (default: ".")
   -m, --mode <mode>      "global": Global Definition, "module": Module Definition (default: "global")
   -h, --help             output usage information
+
+```
+
+## Example
+
+```proto
+syntax = "proto3";
+
+enum Fruit {
+  Apple = 0;
+  Banana = 1;
+}
+
+message Package {
+  string id = 1;
+  float price = 2;
+}
+
+```
+Will be transformed to
+
+```typescript
+declare enum Fruit {
+  Apple = 0,
+  Banana = 1,
+}
+
+interface Package {
+  id: string;
+  price: number;
+}
+```
+Or TypeScript module
+```typescript
+export enum Fruit {
+  Apple = 0,
+  Banana = 1,
+}
+
+export interface Package {
+  id: string;
+  price: number;
+}
 
 ```
 
