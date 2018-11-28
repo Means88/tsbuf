@@ -46,6 +46,7 @@ export class TsVisitor {
         iscope.node.fields.push({
           typeName: field.typeName,
           name: field.name.name,
+          repeated: field.repeated,
         });
       },
     },

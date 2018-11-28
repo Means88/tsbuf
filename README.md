@@ -16,7 +16,7 @@ tsbuf ~/path/to/protobuf/root -o output/
 - [x] Cli
 - [ ] Oneof Field
 - [ ] Map Field
-- [ ] Nested Type
+- [x] Nested Type
 - [x] Generate Global Declaration
 - [ ] Import (Generate Module)
 - [ ] Other Options

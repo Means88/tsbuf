@@ -1,12 +1,15 @@
 import * as prettier from 'prettier';
 
+export interface InterfaceTreeField {
+  typeName: Type;
+  name: string;
+  repeated: boolean;
+}
+
 export interface InterfaceTree {
   node: {
     name: string;
-    fields: Array<{
-      typeName: Type;
-      name: string;
-    }>;
+    fields: InterfaceTreeField[];
   };
   children: InterfaceTree[];
 }
@@ -26,17 +29,18 @@ const generateEnum = (mode: GenerateMode = GenerateMode.Global) => (ast: Enum): 
 const generateInterface = (mode: GenerateMode) => (i: InterfaceTree): string => {
   const scopeNames = i.children.map(c => c.node.name);
 
-  const getType = (typeName: Type): string => {
-    const name = typeMapping(typeName);
-    if (scopeNames.indexOf(name) === -1) {
-      return name;
+  const getType = (field: InterfaceTreeField): string => {
+    const name = typeMapping(field.typeName);
+    let fullName = scopeNames.indexOf(name) === -1 ? name : `${i.node.name}.${name}`;
+    if (field.repeated) {
+      fullName += '[]';
     }
-    return `${i.node.name}.${name}`;
+    return fullName;
   };
 
   return `
 ${mode === GenerateMode.Global ? '' : 'export '}interface ${i.node.name} {
-  ${i.node.fields.map((f: { name: string; typeName: Type }) => `${f.name}: ${getType(f.typeName)};`).join('')}
+  ${i.node.fields.map((f: InterfaceTreeField) => `${f.name}: ${getType(f)};`).join('')}
 }
 
 ${
