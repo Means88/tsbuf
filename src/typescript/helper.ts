@@ -5,6 +5,7 @@ export interface InterfaceTreeNormalField {
   typeName: Type;
   name: string;
   repeated: boolean;
+  optional?: boolean;
 }
 
 export interface InterfaceTreeMapField {
@@ -12,6 +13,7 @@ export interface InterfaceTreeMapField {
   typeName: Type;
   name: string;
   repeated?: false;
+  optional?: boolean;
 }
 
 type InterfaceTreeField = InterfaceTreeNormalField | InterfaceTreeMapField;
@@ -47,11 +49,11 @@ function getType(field: InterfaceTreeField, it: InterfaceTree): string {
 }
 
 function generateNormalField(f: InterfaceTreeNormalField, it: InterfaceTree): string {
-  return `${f.name}: ${getType(f, it)};`;
+  return `${f.name}${f.optional ? '?' : ''}: ${getType(f, it)};`;
 }
 
 function generateMapField(f: InterfaceTreeMapField, it: InterfaceTree): string {
-  return `${f.name}: {
+  return `${f.name}${f.optional ? '?' : ''}: {
     [key: string]: ${getType(f, it)},
   };`;
 }

@@ -58,6 +58,13 @@ export const semanticVisitor: Visitor = {
     }
     popScope(path);
   },
+  Oneof(path: Path, walk: WalkAction): void {
+    const oneof = path.node as Oneof;
+    walk(oneof.name);
+    for (const node of oneof.body) {
+      walk(node);
+    }
+  },
   Identifier(path: Path, walk: WalkAction): void {
     path.context.scopeStack.createBinding(path);
   },

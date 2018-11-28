@@ -60,7 +60,7 @@ interface EnumValueOption extends BaseNode {
 interface Message extends BaseNode {
   type: 'Message';
   name: Identifier;
-  body: Array<Field | Message>;
+  body: Array<Field | Message | MapField | Oneof>;
 }
 
 interface Field extends BaseNode {
@@ -82,12 +82,13 @@ interface MapField extends BaseNode {
 }
 
 interface Oneof extends BaseNode {
-  type: 'OneofField';
+  type: 'Oneof';
   name: Identifier;
   body: Array<OneofField | EmptyStatement>;
 }
 
 interface OneofField extends BaseNode {
+  type: 'OneofField';
   typeName: Type;
   name: Identifier;
   value: IntegerLiteral;

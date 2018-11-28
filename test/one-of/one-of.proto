@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+message Foo {
+  oneof test_oneof {
+    int32 foo = 1;
+    string bar = 2;
+  }
+}
+
+message Bar {
+  oneof test_oneof {
+    Foo foo = 1;
+    string bar = 2;
+  }
+}
