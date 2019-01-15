@@ -30,7 +30,7 @@ export class InterfaceVisitor {
     },
     Field: {
       exit: (path: Path): void => {
-        const field = path.node as Field | Rpc;
+        const field = path.node as Field;
         const iscope = this.getInterfaceScope();
         if (iscope === null) {
           throw new Error('Field should be included in Message.');

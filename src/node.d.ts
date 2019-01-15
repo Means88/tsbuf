@@ -60,13 +60,7 @@ interface EnumValueOption extends BaseNode {
 interface Message extends BaseNode {
   type: 'Message';
   name: Identifier;
-  body: Array<Field | Message | MapField | Oneof>;
-}
-
-interface Service extends BaseNode {
-  type: 'Service';
-  name: Identifier;
-  body: Array<Rpc>;
+  body: Array<Field | Message | MapField | Oneof >;
 }
 
 interface Field extends BaseNode {
@@ -78,17 +72,6 @@ interface Field extends BaseNode {
   options: Nullable<FieldOption[]>;
   argTypeName: Type,
   returnTypeName: Type,
-}
-
-interface Rpc extends BaseNode {
-  type: 'Rpc';
-  repeated: boolean;
-  typeName: Type;
-  name: Identifier;
-  argTypeName: Type,
-  returnTypeName: Type,
-  value: IntegerLiteral;
-  options: Nullable<FieldOption[]>;
 }
 
 interface MapField extends BaseNode {
