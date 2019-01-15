@@ -63,11 +63,30 @@ interface Message extends BaseNode {
   body: Array<Field | Message | MapField | Oneof>;
 }
 
+interface Service extends BaseNode {
+  type: 'Service';
+  name: Identifier;
+  body: Array<Rpc>;
+}
+
 interface Field extends BaseNode {
   type: 'Field';
   repeated: boolean;
   typeName: Type;
   name: Identifier;
+  value: IntegerLiteral;
+  options: Nullable<FieldOption[]>;
+  argTypeName: Type,
+  returnTypeName: Type,
+}
+
+interface Rpc extends BaseNode {
+  type: 'Rpc';
+  repeated: boolean;
+  typeName: Type;
+  name: Identifier;
+  argTypeName: Type,
+  returnTypeName: Type,
   value: IntegerLiteral;
   options: Nullable<FieldOption[]>;
 }

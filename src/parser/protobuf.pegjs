@@ -47,7 +47,7 @@ SingleLineComment
 
 // Letters and digits
 Letter
-  = [A-Za-z]
+  = [_A-Za-z]
 
 DecimalDigit
   = [0-9]
@@ -436,21 +436,21 @@ MessageBody
 Service
   = "service" _ name:ServiceName __ body:ServiceBody {
     return {
-      type: 'Service',
+      type: 'Message',
       name,
       body,
     }
   }
 
 ServiceBody
-  = "{" __ body:(Option / Rpc / EmptyStatement)* __ "}" {
-    return body;
+  = "{" body:(__ (Option / Rpc / EmptyStatement) __)* "}" {
+     return body ? body.map(i => i[1]) : [];
   }
 
 Rpc
   = "rpc" _ name:RpcName _ "(" _ argStream:"stream"? _ argTypeName:MessageType _ ")" _ "returns" _ "(" _ returnStream:"stream"? _ returnTypeName:MessageType _ ")" __ body:(RpcBody / ';') {
     return {
-      type: 'Rpc',
+      type: 'Field',
       name,
       argStream: argStream !== null,
       argTypeName,
@@ -471,13 +471,10 @@ RpcBody
 // Proto file
 
 Proto
-  = __ syntax:Syntax __ body:(__(Import / Package / Option / TopLevelDef / EmptyStatement)__)* __ {
+  = __ syntax:Syntax __ body:(__(Import / Package / Option / Message / Enum / Service / EmptyStatement)__)* __ {
     return {
       type: 'Proto',
       syntax,
       body: body && body.map(i => i[1]),
     }
   }
-
-TopLevelDef
-  = Message / Enum / Service

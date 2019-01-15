@@ -8,6 +8,16 @@ export interface InterfaceTreeNormalField {
   optional?: boolean;
 }
 
+export interface InterfaceTreeRpc {
+  type: 'rpc';
+  typeName: Type;
+  name: string;
+  argTypeName: Type;
+  returnTypeName: Type;
+  optional?: boolean;
+  repeated?: boolean
+}
+
 export interface InterfaceTreeMapField {
   type: 'map';
   typeName: Type;
@@ -16,7 +26,7 @@ export interface InterfaceTreeMapField {
   optional?: boolean;
 }
 
-type InterfaceTreeField = InterfaceTreeNormalField | InterfaceTreeMapField;
+type InterfaceTreeField = InterfaceTreeNormalField | InterfaceTreeMapField | InterfaceTreeRpc;
 
 export interface InterfaceTree {
   node: {
@@ -36,6 +46,30 @@ function getType(field: InterfaceTreeField, it: InterfaceTree): string {
   return fullName;
 }
 
+function getRpcArgTypeName(field: InterfaceTreeRpc, it: InterfaceTree): string {
+  const scopeNames = it.children.map(c => c.node.name);
+  const name = typeMapping(field.argTypeName);
+  let fullName = scopeNames.indexOf(name) === -1 ? name : `${it.node.name}.${name}`;
+  if (field.repeated) {
+    fullName += '[]';
+  }
+  return fullName;
+}
+
+function getRpcArgReturnTypeName(field: InterfaceTreeRpc, it: InterfaceTree): string {
+  const scopeNames = it.children.map(c => c.node.name);
+  const name = typeMapping(field.returnTypeName);
+  let fullName = scopeNames.indexOf(name) === -1 ? name : `${it.node.name}.${name}`;
+  if (field.repeated) {
+    fullName += '[]';
+  }
+  return fullName;
+}
+
+function generateRpc(f: InterfaceTreeRpc, it: InterfaceTree): string {
+  return `${f.name}(request: ${getRpcArgTypeName(f, it)}): Observable<${getRpcArgReturnTypeName(f, it)}>;`
+}
+
 function generateNormalField(f: InterfaceTreeNormalField, it: InterfaceTree): string {
   return `${f.name}${f.optional ? '?' : ''}: ${getType(f, it)};`;
 }
@@ -53,6 +87,9 @@ ${mode === GenerateMode.Global ? '' : 'export '}interface ${i.node.name} {
     .map((f: InterfaceTreeField) => {
       if (f.type === 'normal') {
         return generateNormalField(f, i);
+      }
+      if (f.type === 'rpc') {
+        return generateRpc(f, i);
       }
       if (f.type === 'map') {
         return generateMapField(f, i);

@@ -30,17 +30,28 @@ export class InterfaceVisitor {
     },
     Field: {
       exit: (path: Path): void => {
-        const field = path.node as Field;
+        const field = path.node as Field | Rpc;
         const iscope = this.getInterfaceScope();
         if (iscope === null) {
           throw new Error('Field should be included in Message.');
         }
-        iscope.node.fields.push({
-          type: 'normal',
-          typeName: field.typeName,
-          name: field.name.name,
-          repeated: field.repeated,
-        });
+        if (field.typeName) {
+          iscope.node.fields.push({
+            type: 'normal',
+            typeName: field.typeName,
+            name: field.name.name,
+            repeated: field.repeated,
+          });
+        } else if (!field.typeName) {
+          iscope.node.fields.push({
+            type: 'rpc',
+            typeName: field.typeName,
+            name: field.name.name,
+            repeated: field.repeated,
+            argTypeName: field.argTypeName,
+            returnTypeName: field.returnTypeName,
+          });
+        }
       },
     },
     MapField: {

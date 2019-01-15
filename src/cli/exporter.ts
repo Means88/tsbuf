@@ -40,7 +40,7 @@ export function exportSource(
   const enums: string = result.enums.map(generateEnum(mode)).join('\n');
   const interfaces: string = result.interfaces.map((i: InterfaceTree) => generateInterface(mode)(i)).join('\n');
   const exportStatements: string = result.imports.map(generateExport(mode, fileName, rootDir)).join('\n');
-  const text = `${importStatements}\n\n${enums}\n${interfaces}\n\n${exportStatements}`;
+  const text = `import { Observable } from 'rxjs';\n${importStatements}\n\n${enums}\n${interfaces}\n\n${exportStatements}`;
   return prettier.format(text, { parser: 'typescript' });
 }
 
