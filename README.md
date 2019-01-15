@@ -1,5 +1,7 @@
 # tsbuf  [![npm@version](https://img.shields.io/npm/v/tsbuf.svg)](https://www.npmjs.com/package/tsbuf) [![Build Status](https://travis-ci.org/Means88/tsbuf.svg?branch=master)](https://travis-ci.org/Means88/tsbuf) [![Coverage Status](https://coveralls.io/repos/github/Means88/tsbuf/badge.svg?branch=master)](https://coveralls.io/github/Means88/tsbuf?branch=master)
 
+This is Fork version of original "https://www.npmjs.com/package/tsbuf" | "https://github.com/Means88/tsbuf" with grpc and nestjs compatibility and one little fix for MongoDb.
+
 Generate TypeScript enum and interface with proto buffer.
 
 ## Usage

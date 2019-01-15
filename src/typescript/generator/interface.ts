@@ -67,7 +67,7 @@ function getRpcArgReturnTypeName(field: InterfaceTreeRpc, it: InterfaceTree): st
 }
 
 function generateRpc(f: InterfaceTreeRpc, it: InterfaceTree): string {
-  return `${f.name}(request: ${getRpcArgTypeName(f, it)}): Observable<${getRpcArgReturnTypeName(f, it)}>;`
+  return `${f.name.charAt(0).toLowerCase() + f.name.substr(1)}(request: ${getRpcArgTypeName(f, it)}): Observable<${getRpcArgReturnTypeName(f, it)}>;`
 }
 
 function generateNormalField(f: InterfaceTreeNormalField, it: InterfaceTree): string {
