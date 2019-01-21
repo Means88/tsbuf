@@ -7,6 +7,7 @@ import { Parser } from '../parser';
 
 import { GenerateMode } from '../typescript';
 import { Generator } from '../typescript/generator';
+import { RPCMethodType } from '../typescript/generator/const';
 import { generateEnum } from '../typescript/generator/enum';
 import { generateExport, generateImport } from '../typescript/generator/import';
 import { generateInterface, InterfaceTree } from '../typescript/generator/interface';
@@ -33,23 +34,28 @@ export const logger = {
 export function exportSource(
   result: any,
   mode: GenerateMode = GenerateMode.Global,
+  rpcMethodType: RPCMethodType = RPCMethodType.AsIs,
   fileName?: string,
   rootDir?: string,
 ): string {
   const importStatements: string = result.imports.map(generateImport(mode, fileName, rootDir)).join('\n');
   const enums: string = result.enums.map(generateEnum(mode)).join('\n');
-  const interfaces: string = result.interfaces.map((i: InterfaceTree) => generateInterface(mode)(i)).join('\n');
+  const interfaces: string = result.interfaces.map((i: InterfaceTree) => generateInterface(mode, rpcMethodType)(i)).join('\n');
   const exportStatements: string = result.imports.map(generateExport(mode, fileName, rootDir)).join('\n');
-  const text = `import { Observable } from 'rxjs';\n${importStatements}\n\n${enums}\n${interfaces}\n\n${exportStatements}`;
-  return prettier.format(text, { parser: 'typescript' });
+  const text = `${importStatements}\n\n${enums}\n${interfaces}\n\n${exportStatements}`;
+  if (rpcMethodType === RPCMethodType.Observable) {
+    return prettier.format(`import { Observable } from 'rxjs';\n${text}`, { parser: 'typescript' });
+  } else {
+    return prettier.format(text, { parser: 'typescript' });
+  }
 }
 
-export function exportSingleFile(inputFileName: string, outputFileName: string, mode: GenerateMode): void {
+export function exportSingleFile(inputFileName: string, outputFileName: string, mode: GenerateMode, rpcMethodType: RPCMethodType): void {
   const proto = fs.readFileSync(inputFileName).toString();
   const ast = Parser.parse(proto);
   const generator = new Generator(ast);
   const interfaces = generator.getResult();
-  const text = exportSource(interfaces, mode);
+  const text = exportSource(interfaces, mode, rpcMethodType);
 
   mkdirp.sync(path.dirname(outputFileName));
   fs.writeFileSync(outputFileName, text);
@@ -76,6 +82,7 @@ export class TypeScriptExporter {
    */
   private handleSource(
     mode: GenerateMode = GenerateMode.Global,
+    rpcMethodType: RPCMethodType = RPCMethodType.AsIs,
     fileName: string,
     rootDir: string,
     outDir: string,
@@ -99,7 +106,7 @@ export class TypeScriptExporter {
       for (const importStatement of result.imports as ImportStatement[]) {
         const fullDependencyPath = path.resolve(rootDir, importStatement.path.value);
         const relativeDependencyPath = path.relative(path.dirname(fileName), fullDependencyPath);
-        const importedMembers = this.handleSource(mode, fullDependencyPath, rootDir, outDir, onError);
+        const importedMembers = this.handleSource(mode, rpcMethodType, fullDependencyPath, rootDir, outDir, onError);
         if (mode !== GenerateMode.Module) {
           continue;
         }
@@ -121,7 +128,7 @@ export class TypeScriptExporter {
 
       // Interface
       const interfaceString: string = result.interfaces
-        .map((i: InterfaceTree) => generateInterface(mode)(i))
+        .map((i: InterfaceTree) => generateInterface(mode, rpcMethodType)(i))
         .join('\n');
       members = members.concat(result.interfaces.map((i: InterfaceTree) => i.node.name));
 

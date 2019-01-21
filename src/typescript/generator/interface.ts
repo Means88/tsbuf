@@ -1,4 +1,4 @@
-import { GenerateMode } from './const';
+import { GenerateMode, RPCMethodType } from './const';
 
 export interface InterfaceTreeNormalField {
   type: 'normal';
@@ -66,8 +66,19 @@ function getRpcArgReturnTypeName(field: InterfaceTreeRpc, it: InterfaceTree): st
   return fullName;
 }
 
-function generateRpc(f: InterfaceTreeRpc, it: InterfaceTree): string {
-  return `${f.name.charAt(0).toLowerCase() + f.name.substr(1)}(request: ${getRpcArgTypeName(f, it)}): Observable<${getRpcArgReturnTypeName(f, it)}>;`
+function generateRpc(f: InterfaceTreeRpc, it: InterfaceTree, rpcMethodType: RPCMethodType): string {
+  return `${f.name.charAt(0).toLowerCase() + f.name.substr(1)}(request: ${getRpcArgTypeName(f, it)}): ${getReturnType(f, it, rpcMethodType)};`
+}
+
+function getReturnType(f: InterfaceTreeRpc, it: InterfaceTree, rpcMethodType: RPCMethodType): string {
+  switch (rpcMethodType) {
+    case RPCMethodType.Promise:
+      return `Promise<${getRpcArgReturnTypeName(f, it)}>`;
+    case RPCMethodType.Observable:
+      return `Observable<${getRpcArgReturnTypeName(f, it)}>`;
+    default:
+      return `${getRpcArgReturnTypeName(f, it)}`;
+  }
 }
 
 function generateNormalField(f: InterfaceTreeNormalField, it: InterfaceTree): string {
@@ -80,7 +91,7 @@ function generateMapField(f: InterfaceTreeMapField, it: InterfaceTree): string {
   };`;
 }
 
-export const generateInterface = (mode: GenerateMode) => (i: InterfaceTree): string =>
+export const generateInterface = (mode: GenerateMode, rpcMethodType: RPCMethodType) => (i: InterfaceTree): string =>
   `
 ${mode === GenerateMode.Global ? '' : 'export '}interface ${i.node.name} {
   ${i.node.fields
@@ -89,7 +100,7 @@ ${mode === GenerateMode.Global ? '' : 'export '}interface ${i.node.name} {
         return generateNormalField(f, i);
       }
       if (f.type === 'rpc') {
-        return generateRpc(f, i);
+        return generateRpc(f, i ,rpcMethodType);
       }
       if (f.type === 'map') {
         return generateMapField(f, i);
@@ -103,7 +114,7 @@ ${
     i.children.length <= 0
       ? ''
       : `${mode === GenerateMode.Global ? 'declare' : 'export'} namespace ${i.node.name} {
-  ${i.children.map(j => generateInterface(GenerateMode.Module)(j)).join('\n')}
+  ${i.children.map(j => generateInterface(GenerateMode.Module, rpcMethodType)(j)).join('\n')}
 }`
   }`;
 
