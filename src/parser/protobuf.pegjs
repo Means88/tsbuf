@@ -444,7 +444,7 @@ Service
 
 ServiceBody
   = "{" body:(__ (Option / Rpc / EmptyStatement) __)* "}" {
-     return body ? body.map(i => i[1]) : [];
+    return body ? body.map(i => i[1]) : [];
   }
 
 Rpc
