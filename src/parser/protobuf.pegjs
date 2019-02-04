@@ -436,7 +436,7 @@ MessageBody
 Service
   = "service" _ name:ServiceName __ body:ServiceBody {
     return {
-      type: 'Message',
+      type: 'Service',
       name,
       body,
     }
@@ -450,7 +450,7 @@ ServiceBody
 Rpc
   = "rpc" _ name:RpcName _ "(" _ argStream:"stream"? _ argTypeName:MessageType _ ")" _ "returns" _ "(" _ returnStream:"stream"? _ returnTypeName:MessageType _ ")" __ body:(RpcBody / ';') {
     return {
-      type: 'Field',
+      type: 'Rpc',
       name,
       argStream: argStream !== null,
       argTypeName,

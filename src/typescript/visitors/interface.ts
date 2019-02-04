@@ -35,23 +35,12 @@ export class InterfaceVisitor {
         if (iscope === null) {
           throw new Error('Field should be included in Message.');
         }
-        if (field.typeName) {
-          iscope.node.fields.push({
-            type: 'normal',
-            typeName: field.typeName,
-            name: field.name.name,
-            repeated: field.repeated,
-          });
-        } else if (!field.typeName) {
-          iscope.node.fields.push({
-            type: 'rpc',
-            typeName: field.typeName,
-            name: field.name.name,
-            repeated: field.repeated,
-            argTypeName: field.argTypeName,
-            returnTypeName: field.returnTypeName,
-          });
-        }
+        iscope.node.fields.push({
+          type: 'normal',
+          typeName: field.typeName,
+          name: field.name.name,
+          repeated: field.repeated,
+        });
       },
     },
     MapField: {

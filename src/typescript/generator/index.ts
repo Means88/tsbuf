@@ -5,6 +5,7 @@ import { Action, Actions, Visitor } from '../../visitor/type';
 import { EnumVisitor } from '../visitors/enum';
 import { ImportVisitor } from '../visitors/import';
 import { InterfaceVisitor } from '../visitors/interface';
+import { ServiceVisitor } from '../visitors/service';
 
 export class Generator {
   private static readonly noop = (): void => {
@@ -37,6 +38,7 @@ export class Generator {
     this.visitors = [
       new EnumVisitor().getVisitor(),
       new InterfaceVisitor().getVisitor(),
+      new ServiceVisitor().getVisitor(),
       new ImportVisitor().getVisitor(),
       ...plugins,
       semanticVisitor,
