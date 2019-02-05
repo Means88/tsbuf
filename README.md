@@ -88,6 +88,36 @@ export interface Package {
 
 ```
 
+### How to use interfaces from service?
+
+Create specified types using TypeScript as follows.
+
+```typescript
+import { MyService } from '...';
+import { Observable } from 'rxjs';
+
+interface BaseServiceDefinition {
+  [key: string]: {
+    request: any;
+    response: any;
+  };
+}
+
+type RxService<T extends BaseServiceDefinition> = {
+  [K in keyof T]: (request: T[K]['request']) => Observable<T[K]['response']>;
+};
+
+/**
+ * `RxService<MyService>` equals:
+ *
+ * interface {
+ *   rpcMethod(request: Request): Observable<Response>;
+ * }
+ *
+ **/
+
+```
+
 ## Roadmap
 
 - [x] Basic Support
