@@ -1,6 +1,6 @@
 {
   "name": "tsbuf",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Generate TypeScript enum and interface with proto buffer.",
   "main": "dist/index.js",
   "bin": "tsbuf",
