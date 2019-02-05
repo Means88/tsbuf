@@ -47,7 +47,7 @@ SingleLineComment
 
 // Letters and digits
 Letter
-  = [A-Za-z]
+  = [_A-Za-z]
 
 DecimalDigit
   = [0-9]
@@ -443,8 +443,8 @@ Service
   }
 
 ServiceBody
-  = "{" __ body:(Option / Rpc / EmptyStatement)* __ "}" {
-    return body;
+  = "{" body:(__ (Option / Rpc / EmptyStatement) __)* "}" {
+    return body ? body.map(i => i[1]) : [];
   }
 
 Rpc
@@ -471,13 +471,10 @@ RpcBody
 // Proto file
 
 Proto
-  = __ syntax:Syntax __ body:(__(Import / Package / Option / TopLevelDef / EmptyStatement)__)* __ {
+  = __ syntax:Syntax __ body:(__(Import / Package / Option / Message / Enum / Service / EmptyStatement)__)* __ {
     return {
       type: 'Proto',
       syntax,
       body: body && body.map(i => i[1]),
     }
   }
-
-TopLevelDef
-  = Message / Enum / Service

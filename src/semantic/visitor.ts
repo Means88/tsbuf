@@ -68,4 +68,10 @@ export const semanticVisitor: Visitor = {
   Identifier(path: Path, walk: WalkAction): void {
     path.context.scopeStack.createBinding(path);
   },
+  Service(path: Path, walk: WalkAction): void {
+    const service = path.node as Service;
+    for (const rpc of service.body) {
+      walk(rpc);
+    }
+  },
 };

@@ -57,6 +57,22 @@ interface EnumValueOption extends BaseNode {
   value: Constant;
 }
 
+interface Service extends BaseNode {
+  type: 'Service';
+  name: Identifier;
+  body: RpcField[];
+}
+
+interface RpcField extends BaseNode {
+  type: 'Rpc';
+  name: Identifier;
+  argStream: boolean;
+  argTypeName: Type;
+  returnStream: boolean;
+  returnTypeName: Type;
+  // body
+}
+
 interface Message extends BaseNode {
   type: 'Message';
   name: Identifier;

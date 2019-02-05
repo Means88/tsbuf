@@ -8,13 +8,13 @@ npm install -g tsbuf
 tsbuf example/proto -o example/typescript/global
 # or
 tsbuf example/proto -o example/typescript/module -m module
- 
+
 ```
 See `example/`
 
 ```console
 $ tsbuf -h
-Usage: tsbuf [options] <inputPath> 
+Usage: tsbuf [options] <inputPath>
 
 protobuf-parser
 Generate TypeScript interface with Protobuf.
@@ -32,6 +32,10 @@ Options:
 ```proto
 syntax = "proto3";
 
+service MyService {
+  rpc rpcMethod(Fruit) returns (Package) {}
+}
+
 enum Fruit {
   Apple = 0;
   Banana = 1;
@@ -46,6 +50,13 @@ message Package {
 Will be transformed to
 
 ```typescript
+interface MyService {
+  rpcMethod: {
+    request: Request;
+    response: Response;
+  };
+}
+
 declare enum Fruit {
   Apple = 0,
   Banana = 1,
@@ -58,6 +69,13 @@ interface Package {
 ```
 Or TypeScript module
 ```typescript
+export interface MyService {
+  rpcMethod: {
+    request: Request;
+    response: Response;
+  };
+}
+
 export enum Fruit {
   Apple = 0,
   Banana = 1,
