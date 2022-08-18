@@ -1,7 +1,7 @@
-import chalk from 'chalk';
 import * as fs from 'fs';
-import * as mkdirp from 'mkdirp';
 import * as path from 'path';
+import chalk from 'chalk';
+import * as mkdirp from 'mkdirp';
 import * as prettier from 'prettier';
 import { Parser } from '../parser';
 
@@ -9,26 +9,30 @@ import { GenerateMode } from '../typescript';
 import { Generator } from '../typescript/generator';
 import { generateEnum } from '../typescript/generator/enum';
 import { generateExport, generateImport } from '../typescript/generator/import';
-import { generateInterface, InterfaceTree } from '../typescript/generator/interface';
+import {
+  generateInterface,
+  InterfaceTree,
+} from '../typescript/generator/interface';
 
-// tslint:disable no-console
+/* eslint-disable no-console -- logger */
 export const logger = {
-  log(a: string = ''): void {
+  log(a = ''): void {
     console.log(a);
   },
-  success(a: string = ''): void {
+  success(a = ''): void {
     console.log(`${chalk.green('success')} ${a}`);
   },
-  error(a: string = ''): void {
+  error(a = ''): void {
     console.log(`${chalk.red('error')} ${a}`);
   },
-  warning(a: string = ''): void {
+  warning(a = ''): void {
     console.log(`${chalk.yellow('warning')} ${a}`);
   },
-  pri(a: string = ''): void {
+  pri(a = ''): void {
     console.log(`${chalk.blue(a)}`);
   },
 };
+/* eslint-enable no-console */
 
 export function exportSource(
   result: any,
@@ -36,15 +40,25 @@ export function exportSource(
   fileName?: string,
   rootDir?: string,
 ): string {
-  const importStatements: string = result.imports.map(generateImport(mode, fileName, rootDir)).join('\n');
+  const importStatements: string = result.imports
+    .map(generateImport(mode, fileName, rootDir))
+    .join('\n');
   const enums: string = result.enums.map(generateEnum(mode)).join('\n');
-  const interfaces: string = result.interfaces.map((i: InterfaceTree) => generateInterface(mode)(i)).join('\n');
-  const exportStatements: string = result.imports.map(generateExport(mode, fileName, rootDir)).join('\n');
+  const interfaces: string = result.interfaces
+    .map((i: InterfaceTree) => generateInterface(mode)(i))
+    .join('\n');
+  const exportStatements: string = result.imports
+    .map(generateExport(mode, fileName, rootDir))
+    .join('\n');
   const text = `${importStatements}\n\n${enums}\n${interfaces}\n\n${exportStatements}`;
   return prettier.format(text, { parser: 'typescript' });
 }
 
-export function exportSingleFile(inputFileName: string, outputFileName: string, mode: GenerateMode): void {
+export function exportSingleFile(
+  inputFileName: string,
+  outputFileName: string,
+  mode: GenerateMode,
+): void {
   const proto = fs.readFileSync(inputFileName).toString();
   const ast = Parser.parse(proto);
   const generator = new Generator(ast);
@@ -56,11 +70,15 @@ export function exportSingleFile(inputFileName: string, outputFileName: string, 
 }
 
 function replaceExt(filePath: string, oldExt: string, ext: string): string {
-  return path.join(path.dirname(filePath), `${path.basename(filePath, oldExt)}${ext}`);
+  return path.join(
+    path.dirname(filePath),
+    `${path.basename(filePath, oldExt)}${ext}`,
+  );
 }
 
 export class TypeScriptExporter {
   private readonly visitedPath: Set<string> = new Set<string>();
+
   private readonly membersByFile: {
     [path: string]: string[];
   } = {};
@@ -74,7 +92,8 @@ export class TypeScriptExporter {
    * @param onError - handleError, return true to continue
    * @return members in the file
    */
-  private handleSource(
+  // eslint-disable-next-line max-params, max-statements
+  public handleSource(
     mode: GenerateMode = GenerateMode.Global,
     fileName: string,
     rootDir: string,
@@ -97,9 +116,21 @@ export class TypeScriptExporter {
       let importString = '';
       let exportString = '';
       for (const importStatement of result.imports as ImportStatement[]) {
-        const fullDependencyPath = path.resolve(rootDir, importStatement.path.value);
-        const relativeDependencyPath = path.relative(path.dirname(fileName), fullDependencyPath);
-        const importedMembers = this.handleSource(mode, fullDependencyPath, rootDir, outDir, onError);
+        const fullDependencyPath = path.resolve(
+          rootDir,
+          importStatement.path.value,
+        );
+        const relativeDependencyPath = path.relative(
+          path.dirname(fileName),
+          fullDependencyPath,
+        );
+        const importedMembers = this.handleSource(
+          mode,
+          fullDependencyPath,
+          rootDir,
+          outDir,
+          onError,
+        );
         if (mode !== GenerateMode.Module) {
           continue;
         }
@@ -107,7 +138,9 @@ export class TypeScriptExporter {
         if (!tsDependencyPath.startsWith('.')) {
           tsDependencyPath = `.${path.sep}${tsDependencyPath}`;
         }
-        importString += `import { ${importedMembers.join(', ')} } from '${tsDependencyPath}';\n`;
+        importString += `import { ${importedMembers.join(
+          ', ',
+        )} } from '${tsDependencyPath}';\n`;
         if (!importStatement.public) {
           continue;
         }
@@ -116,18 +149,27 @@ export class TypeScriptExporter {
       }
 
       // Enum
-      const enumString: string = result.enums.map(generateEnum(mode)).join('\n');
-      members = members.concat(result.enums.map((enumAst: Enum) => enumAst.name.name));
+      const enumString: string = result.enums
+        .map(generateEnum(mode))
+        .join('\n');
+      members = members.concat(
+        result.enums.map((enumAst: Enum) => enumAst.name.name),
+      );
 
       // Interface
       const interfaceString: string = result.interfaces
         .map((i: InterfaceTree) => generateInterface(mode)(i))
         .join('\n');
-      members = members.concat(result.interfaces.map((i: InterfaceTree) => i.node.name));
+      members = members.concat(
+        result.interfaces.map((i: InterfaceTree) => i.node.name),
+      );
 
-      const outputText = prettier.format([importString, enumString, interfaceString, exportString].join('\n'), {
-        parser: 'typescript',
-      });
+      const outputText = prettier.format(
+        [importString, enumString, interfaceString, exportString].join('\n'),
+        {
+          parser: 'typescript',
+        },
+      );
       // Generate file
       const relativePath = path.relative(rootDir, fileName);
       const absoluteOutputPath = path.resolve(outDir, relativePath);
@@ -144,7 +186,7 @@ export class TypeScriptExporter {
       return members;
     } catch (e) {
       this.visitedPath.delete(fileName);
-      if (onError && onError(fileName)) {
+      if (onError?.(fileName)) {
         return [];
       }
       throw e;

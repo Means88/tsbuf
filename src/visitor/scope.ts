@@ -3,9 +3,13 @@ import { Path } from './path';
 
 export class Scope {
   public readonly path: Path;
+
   public readonly parent: Nullable<Scope>;
+
   public readonly block: BaseNode;
+
   public readonly parentBlock: Nullable<BaseNode>;
+
   public readonly bindings: { [id: string]: Binding } = {};
 
   public constructor(path: Path, parentScope: Nullable<Scope>) {

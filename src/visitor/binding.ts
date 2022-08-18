@@ -8,11 +8,19 @@ export enum BindingKind {
 
 export class Binding {
   public readonly id: Identifier;
+
   public readonly scope: Scope;
+
   public readonly path: Path;
+
   public readonly kind: BindingKind;
 
-  public constructor(params: { id: Identifier; scope: Scope; path: Path; kind: BindingKind }) {
+  public constructor(params: {
+    id: Identifier;
+    scope: Scope;
+    path: Path;
+    kind: BindingKind;
+  }) {
     this.id = params.id;
     this.scope = params.scope;
     this.path = params.path;

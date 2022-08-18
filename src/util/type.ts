@@ -33,5 +33,7 @@ export function extendedTypeMapping(typeName: ExtendedType): string {
   if (!typeName.path || typeName.path.length === 0) {
     return typeName.identifier.name;
   }
-  return [...typeName.path.map(id => id.name), typeName.identifier.name].join('.');
+  return [...typeName.path.map(id => id.name), typeName.identifier.name].join(
+    '.',
+  );
 }
